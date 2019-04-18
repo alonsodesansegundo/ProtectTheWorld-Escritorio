@@ -58,6 +58,8 @@ namespace ProtectTheWorld
             this.IsMouseVisible = true;
             //STRINGS
             titulo = "Protect the World";
+           
+
         }
 
         /// <summary>
@@ -66,15 +68,17 @@ namespace ProtectTheWorld
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            
 
             // TODO: use this.Content to load your game content here
             fondoMenu = Content.Load<Texture2D>("fondomenu");
             fuente = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
+            // Create a new SpriteBatch, which can be used to draw textures.
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            jugar = new Boton(this.graphics, this.spriteBatch, 50, 0, 50, 50, Color.Blue);
 
-            jugar = new Boton(this.graphics, this.spriteBatch, 50, 0, 50, 50, Color.Black);
-            jugar.SetTexto(titulo, fuente, Color.White);
+            
+
         }
 
 
@@ -149,64 +153,83 @@ namespace ProtectTheWorld
             }
         }
         //MENÚ PRINCIPAL
+        //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ PRINCIPAL
         public void DibujaMenu()
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
-            spriteBatch.Draw(fondoMenu, new Rectangle(0, 0,
-              AnchoPantalla, AltoPantalla), Color.White);
+            //dibujo el fondo
+            spriteBatch.Draw(fondoMenu, new Rectangle(0, 0,AnchoPantalla, AltoPantalla), Color.White);
+            //prueba set texto set imagen
+            jugar.SetTexto(titulo, fuente, Color.White);
+            //jugar.SetImagen(fondoMenu);
             jugar.Dibuja();
             spriteBatch.End();
         }
+        //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ PRINCIPAL
         public void GestionaMenu()
         {
+            //si pulsa el boton jugar
+            if (this.Pulsa(jugar))
+            {
 
+            }
         }
 
         //JUEGO
+        //MÉTODO ENCARGADO DE DIBUJAR EL JUEGO
         public void DibujaJuego()
         {
 
         }
+        //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
         public void GestionaJuego()
         {
 
         }
 
         //OPCIONES
+        //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ OPCIONES
         public void DibujaOpciones()
         {
 
         }
+        //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ OPCIONES
         public void GestionaOpciones()
         {
 
         }
-        //RÉCORDS
+        //RÉCORDS        
+        //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ RÉCORDS
+
         public void DibujaRecords()
         {
 
         }
+        //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ RÉCORDS
         public void GestionaRecords()
         {
 
         }
         //CRÉDITOS
+        //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ CRÉDITOS
         public void DibujaCreditos()
         {
 
         }
+        //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ CRÉDITOS
         public void GestionaCreditos()
         {
 
         }
 
+        //PULSA
         //MÉTODO PARA SABER SI HEMOS PULSADO CON EL BOTON IZQUIERDO DEL MOUSE UNA REGION ESPECIFICA DE LA PANTALLA
-        public bool Pulsa(Rectangle rectangulo)
+        public bool Pulsa(Boton b)
         {
             //SI PULSO EL BOTON IZQUIERDO DEL RATON SOBRE UN RECTANGULO DADO, DEVUELVO TRUE
             if (Mouse.GetState().LeftButton == ButtonState.Pressed &&
-                rectangulo.Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y))) return true;
+                b.GetContenedor().Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y))) return true;
 
             //EN CASO CONTRARIO, DEVUELVO FALSE
             return false;
