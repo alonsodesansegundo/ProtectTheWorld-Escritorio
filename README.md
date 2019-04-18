@@ -11,3 +11,6 @@ Miércoles 17 de Abril
 Estructura de lo que será el juego, tanto para dibujar como para gestionar la lógica e interación del usuario con el juego.
 Añadido de las posibles imágenes que tendrá el juego.
 Creación y prueba de mi clase botón.
+
+Jueves 18 de Abril
+Añadidos en la clase botón
