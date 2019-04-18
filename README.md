@@ -14,4 +14,5 @@ Creación y prueba de mi clase botón.
 
 Jueves 18 de Abril
 
-Añadidos en la clase botón
+Añadidos en la clase botón.
+Al comenzar a hacer pruebas para dibujar texto me daba el siguiente error: FontDescriptionProcessor had unexpected failure. Para la solución de dicho problema he consultado diferentes sitios webs y foros hasta dar con la solución, descargar e instalar Visual C++ Redistributable for Visual Studio 2012 Update 4 (a través de la página https://www.microsoft.com/en-NZ/download/details.aspx?id=30679).
