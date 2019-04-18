@@ -265,3 +265,10 @@
 /processorParam:TextureFormat=Color
 /build:fondomenu.jpg
 
+#begin Fuentes/FuenteTitulo.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fuentes/FuenteTitulo.spritefont
+

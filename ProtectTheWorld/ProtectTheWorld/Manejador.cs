@@ -23,6 +23,8 @@ namespace ProtectTheWorld
 
         EstadoJuego estadoActual;
         private int AnchoPantalla, AltoPantalla;
+        private SpriteFont fuente;
+        private string titulo;
         Texture2D fondoMenu;
         Boton jugar;
         public Manejador()
@@ -54,9 +56,8 @@ namespace ProtectTheWorld
 
             //HAGO VISIBLE EL RATÓN
             this.IsMouseVisible = true;
-
-            
-
+            //STRINGS
+            titulo = "Protect the World";
         }
 
         /// <summary>
@@ -70,8 +71,10 @@ namespace ProtectTheWorld
 
             // TODO: use this.Content to load your game content here
             fondoMenu = Content.Load<Texture2D>("fondomenu");
+            fuente = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
 
-            jugar = new Boton(this.graphics, this.spriteBatch, 50, 0, 50, 50, Color.Green);
+            jugar = new Boton(this.graphics, this.spriteBatch, 50, 0, 50, 50, Color.Black);
+            jugar.SetTexto(titulo, fuente, Color.White);
         }
 
 
@@ -152,7 +155,6 @@ namespace ProtectTheWorld
             spriteBatch.Begin();
             spriteBatch.Draw(fondoMenu, new Rectangle(0, 0,
               AnchoPantalla, AltoPantalla), Color.White);
-
             jugar.Dibuja();
             spriteBatch.End();
         }
