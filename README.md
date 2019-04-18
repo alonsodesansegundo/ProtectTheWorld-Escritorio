@@ -13,4 +13,5 @@ Añadido de las posibles imágenes que tendrá el juego.
 Creación y prueba de mi clase botón.
 
 Jueves 18 de Abril
+
 Añadidos en la clase botón
