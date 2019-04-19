@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using Windows.UI.ViewManagement;
 
 namespace ProtectTheWorld
@@ -21,12 +22,14 @@ namespace ProtectTheWorld
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        EstadoJuego estadoActual;
+        private EstadoJuego estadoActualJuego;
+        private ButtonState estadoClickIzq;
         private int AnchoPantalla, AltoPantalla;
         private SpriteFont fuente;
         private string titulo;
-        Texture2D fondoMenu;
-        Boton jugar;
+        private List<Boton> botonesMenu;
+        private Texture2D fondoMenu;
+        private Boton jugar;
         public Manejador()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -52,13 +55,17 @@ namespace ProtectTheWorld
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
 
             //INICIALIZO LA PRIMERA PANTALLA
-            estadoActual = EstadoJuego.Menu;
+            estadoActualJuego = EstadoJuego.Menu;
 
             //HAGO VISIBLE EL RATÓN
             this.IsMouseVisible = true;
             //STRINGS
             titulo = "Protect the World";
-           
+
+            //ESTADO ACTUAL BOTON CLICK IZQ
+            estadoClickIzq = ButtonState.Released;
+
+            
 
         }
 
@@ -68,20 +75,21 @@ namespace ProtectTheWorld
         /// </summary>
         protected override void LoadContent()
         {
-            
+
 
             // TODO: use this.Content to load your game content here
             fondoMenu = Content.Load<Texture2D>("fondomenu");
             fuente = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatch = new SpriteBatch(GraphicsDevice);    
+            //ARRAYLIST DE BOTONES
+            //MENU
+            botonesMenu = new List<Boton>();    //aqui porque si lo pongo en el método instance da null reference exception
             jugar = new Boton(this.graphics, this.spriteBatch, 50, 0, 50, 50, Color.Blue);
-
-            
-
+            botonesMenu.Add(jugar);
         }
 
-
+        /// <summary>
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// game-specific content.
@@ -101,7 +109,7 @@ namespace ProtectTheWorld
             // TODO: Add your update logic here
 
             base.Update(gameTime);
-            switch (estadoActual)
+            switch (estadoActualJuego)
             {
                 case EstadoJuego.Menu:
                     GestionaMenu();
@@ -133,7 +141,7 @@ namespace ProtectTheWorld
 
             base.Draw(gameTime);
 
-            switch (estadoActual)
+            switch (estadoActualJuego)
             {
                 case EstadoJuego.Menu:
                     DibujaMenu();
@@ -159,7 +167,7 @@ namespace ProtectTheWorld
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
             //dibujo el fondo
-            spriteBatch.Draw(fondoMenu, new Rectangle(0, 0,AnchoPantalla, AltoPantalla), Color.White);
+            spriteBatch.Draw(fondoMenu, new Rectangle(0, 0, AnchoPantalla, AltoPantalla), Color.White);
             //prueba set texto set imagen
             jugar.SetTexto(titulo, fuente, Color.White);
             //jugar.SetImagen(fondoMenu);
@@ -169,10 +177,35 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ PRINCIPAL
         public void GestionaMenu()
         {
-            //si pulsa el boton jugar
-            if (this.Pulsa(jugar))
+            //si cambia el estado del click izq
+            if (estadoClickIzq != Mouse.GetState().LeftButton)
             {
+                //cambio mi variable
+                estadoClickIzq = Mouse.GetState().LeftButton;
+                //dependiendo del estado actual del click izquierdo, hago una cosa u otra
+                switch (estadoClickIzq)
+                {
+                    //si el boton izq está pulsado
+                    case ButtonState.Pressed:
+                        //veo si he pulsado en algun boton, de ser así, pongo su bandera a true
+                        foreach (Boton btn in botonesMenu)
+                        {
+                            if (ClickIzq(btn))
+                                btn.SetBandera(true);
+                        }
 
+                        break;
+                    //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
+                    case ButtonState.Released:
+                        if (LevantoIzq(jugar))
+                            titulo = "FUNCIONA";
+                        //pongo a false las banderas de todos los botones del menu
+                        foreach (Boton btn in botonesMenu)
+                        {
+                            btn.SetBandera(false);
+                        }
+                        break;
+                }
             }
         }
 
@@ -225,13 +258,18 @@ namespace ProtectTheWorld
 
         //PULSA
         //MÉTODO PARA SABER SI HEMOS PULSADO CON EL BOTON IZQUIERDO DEL MOUSE UNA REGION ESPECIFICA DE LA PANTALLA
-        public bool Pulsa(Boton b)
+        public bool ClickIzq(Boton b)
         {
             //SI PULSO EL BOTON IZQUIERDO DEL RATON SOBRE UN RECTANGULO DADO, DEVUELVO TRUE
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed &&
-                b.GetContenedor().Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y))) return true;
+            if (b.GetContenedor().Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y))) return true;
 
             //EN CASO CONTRARIO, DEVUELVO FALSE
+            return false;
+        }
+
+        public bool LevantoIzq(Boton b)
+        {
+            if (b.GetBandera() && b.GetContenedor().Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y))) return true;
             return false;
         }
     }

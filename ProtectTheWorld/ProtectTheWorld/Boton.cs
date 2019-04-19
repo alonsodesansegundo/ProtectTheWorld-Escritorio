@@ -13,7 +13,7 @@ namespace ProtectTheWorld
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private Texture2D rectangulo;
-
+        private bool bandera;
         private Color[] data;
         private Vector2 punto;
         private int x,y,ancho, alto;
@@ -35,12 +35,21 @@ namespace ProtectTheWorld
             this.y = y;
             this.ancho = ancho;
             this.alto = alto;
+            this.bandera = false;
             contenedor = new Rectangle(x, y, ancho, alto);
             rectangulo = new Texture2D(graphics.GraphicsDevice, ancho, alto);
             data = new Color[ancho * alto];
             for (int i = 0; i < data.Length; ++i) data[i] = color;
             rectangulo.SetData(data);
             punto = new Vector2(x, y);
+        }
+        public bool GetBandera()
+        {
+            return this.bandera;
+        }
+        public void SetBandera(bool booleana)
+        {
+            this.bandera = booleana;
         }
         public Rectangle GetContenedor()
         {
