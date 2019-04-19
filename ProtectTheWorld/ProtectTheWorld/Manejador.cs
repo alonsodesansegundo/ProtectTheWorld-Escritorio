@@ -25,8 +25,8 @@ namespace ProtectTheWorld
         private EstadoJuego estadoActualJuego;
         private ButtonState estadoClickIzq;
         private int AnchoPantalla, AltoPantalla;
-        private SpriteFont fuente;
-        private string titulo;
+        private SpriteFont fuenteTitulo,fuenteBotones;
+        private string titulo,txtJugar,txtOpciones,txtRecords,txtCreditos;
         private List<Boton> botonesMenu;
         private Texture2D fondoMenu;
         private Boton jugar;
@@ -47,9 +47,7 @@ namespace ProtectTheWorld
             // TODO: Add your initialization logic here
 
             base.Initialize();
-            //ANCHO Y ALTO PANTALLA
-            AltoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Height;
-            AnchoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Width;
+            
 
             //PANTALLA COMPLETA
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
@@ -59,14 +57,9 @@ namespace ProtectTheWorld
 
             //HAGO VISIBLE EL RATÓN
             this.IsMouseVisible = true;
-            //STRINGS
-            titulo = "Protect the World";
-
+            
             //ESTADO ACTUAL BOTON CLICK IZQ
             estadoClickIzq = ButtonState.Released;
-
-            
-
         }
 
         /// <summary>
@@ -75,17 +68,28 @@ namespace ProtectTheWorld
         /// </summary>
         protected override void LoadContent()
         {
+            //ANCHO Y ALTO PANTALLA
+            AltoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Height;
+            AnchoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Width;
 
+            //STRINGS
+            titulo = "Protect the World";
+            txtJugar = "Jugar";
+            txtOpciones = "Opciones";
+            txtCreditos = "Créditos";
+            txtRecords = "Récords";
 
             // TODO: use this.Content to load your game content here
             fondoMenu = Content.Load<Texture2D>("fondomenu");
-            fuente = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
+            fuenteTitulo = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
+            fuenteBotones = Content.Load<SpriteFont>("Fuentes/FuenteBotones");
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);    
             //ARRAYLIST DE BOTONES
             //MENU
             botonesMenu = new List<Boton>();    //aqui porque si lo pongo en el método instance da null reference exception
-            jugar = new Boton(this.graphics, this.spriteBatch, 50, 0, 50, 50, Color.Blue);
+            //punto x, punto y, alto y ancho
+            jugar = new Boton(this.graphics, this.spriteBatch,(AnchoPantalla- (int)fuenteTitulo.MeasureString(titulo).X)/2, AltoPantalla / 6+ (int)fuenteTitulo.MeasureString(titulo).Y, (int)fuenteBotones.MeasureString(txtJugar).X, (int)fuenteBotones.MeasureString(txtJugar).Y, Color.Transparent);
             botonesMenu.Add(jugar);
         }
 
@@ -168,8 +172,10 @@ namespace ProtectTheWorld
             spriteBatch.Begin();
             //dibujo el fondo
             spriteBatch.Draw(fondoMenu, new Rectangle(0, 0, AnchoPantalla, AltoPantalla), Color.White);
+            //dibujo el titulo del juego
+            spriteBatch.DrawString(fuenteTitulo, titulo, new Vector2(AnchoPantalla / 2-fuenteTitulo.MeasureString(titulo).X/2, AltoPantalla / 6), Color.White);
             //prueba set texto set imagen
-            jugar.SetTexto(titulo, fuente, Color.White);
+            jugar.SetTexto(txtJugar, fuenteBotones, Color.White);
             //jugar.SetImagen(fondoMenu);
             jugar.Dibuja();
             spriteBatch.End();
@@ -198,7 +204,8 @@ namespace ProtectTheWorld
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
                         if (LevantoIzq(jugar))
-                            titulo = "FUNCIONA";
+                            estadoActualJuego = EstadoJuego.Gameplay;
+                            //titulo = "FUNCIONA";
                         //pongo a false las banderas de todos los botones del menu
                         foreach (Boton btn in botonesMenu)
                         {
@@ -213,7 +220,10 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE DIBUJAR EL JUEGO
         public void DibujaJuego()
         {
-
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(fuenteTitulo, "GAMEPLAY", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
         public void GestionaJuego()
