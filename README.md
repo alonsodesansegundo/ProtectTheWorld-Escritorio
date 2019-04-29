@@ -20,3 +20,7 @@ Al comenzar a hacer pruebas para dibujar texto me daba el siguiente error: FontD
 Viernes 19 de Abril
 
 Correción del comportamiento del botón cuando haciamos click en el. El click no funcionaba correctamente, ahora si.
+
+Lunes 29 de Abril
+
+Colocación botones en el menú principal. Falta jugar con el espacio restante para que los botones ocupen el ancho del titulo.
