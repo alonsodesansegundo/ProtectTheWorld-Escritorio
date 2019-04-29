@@ -10,6 +10,7 @@ namespace ProtectTheWorld
     {
         Menu,
         Gameplay,
+        Ayuda,
         Creditos,
         Records,
         Opciones
@@ -25,11 +26,11 @@ namespace ProtectTheWorld
         private EstadoJuego estadoActualJuego;
         private ButtonState estadoClickIzq;
         private int AnchoPantalla, AltoPantalla;
-        private SpriteFont fuenteTitulo,fuenteBotones;
-        private string titulo,txtJugar,txtOpciones,txtRecords,txtCreditos;
+        private SpriteFont fuenteTitulo, fuenteBotones;
+        private string titulo, txtJugar, txtOpciones, txtAyuda, txtRecords, txtCreditos;
         private List<Boton> botonesMenu;
         private Texture2D fondoMenu;
-        private Boton jugar;
+        private Boton btnJugar, btnOpciones, btnAyuda, btnRecords, btnCreditos;
         public Manejador()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -47,7 +48,7 @@ namespace ProtectTheWorld
             // TODO: Add your initialization logic here
 
             base.Initialize();
-            
+
 
             //PANTALLA COMPLETA
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
@@ -57,7 +58,7 @@ namespace ProtectTheWorld
 
             //HAGO VISIBLE EL RATÓN
             this.IsMouseVisible = true;
-            
+
             //ESTADO ACTUAL BOTON CLICK IZQ
             estadoClickIzq = ButtonState.Released;
         }
@@ -76,21 +77,72 @@ namespace ProtectTheWorld
             titulo = "Protect the World";
             txtJugar = "Jugar";
             txtOpciones = "Opciones";
-            txtCreditos = "Créditos";
-            txtRecords = "Récords";
+            txtAyuda = "Ayuda";
+            txtCreditos = "Creditos";
+            txtRecords = "Records";
 
             // TODO: use this.Content to load your game content here
             fondoMenu = Content.Load<Texture2D>("fondomenu");
             fuenteTitulo = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
             fuenteBotones = Content.Load<SpriteFont>("Fuentes/FuenteBotones");
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);    
+            spriteBatch = new SpriteBatch(GraphicsDevice);
             //ARRAYLIST DE BOTONES
             //MENU
             botonesMenu = new List<Boton>();    //aqui porque si lo pongo en el método instance da null reference exception
             //punto x, punto y, alto y ancho
-            jugar = new Boton(this.graphics, this.spriteBatch,(AnchoPantalla- (int)fuenteTitulo.MeasureString(titulo).X)/2, AltoPantalla / 6+ (int)fuenteTitulo.MeasureString(titulo).Y, (int)fuenteBotones.MeasureString(txtJugar).X, (int)fuenteBotones.MeasureString(txtJugar).Y, Color.Transparent);
-            botonesMenu.Add(jugar);
+            int espacio = (int)fuenteBotones.MeasureString(titulo).X -
+                ((int)fuenteBotones.MeasureString(txtJugar).X +
+                (int)fuenteBotones.MeasureString(txtOpciones).X+
+                 (int)fuenteBotones.MeasureString(txtAyuda).X+
+                  (int)fuenteBotones.MeasureString(txtRecords).X+
+                   (int)fuenteBotones.MeasureString(txtRecords).X);
+            espacio = espacio / 4;
+            int ancho;
+            int alto = (int)fuenteBotones.MeasureString(txtJugar).Y;
+            //Boton jugar
+            btnJugar = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2,
+                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+                (int)fuenteBotones.MeasureString(txtJugar).X,
+                alto,
+                Color.Blue);
+            botonesMenu.Add(btnJugar);
+            ancho = (int)fuenteBotones.MeasureString(txtJugar).X;
+
+            //Boton opciones
+            btnOpciones = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho,
+               AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+               (int)fuenteBotones.MeasureString(txtOpciones).X,
+               alto,
+               Color.Red);
+            botonesMenu.Add(btnOpciones);
+            ancho += (int)fuenteBotones.MeasureString(txtOpciones).X;
+
+            //Boton ayuda
+            btnAyuda = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho,
+                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+                (int)fuenteBotones.MeasureString(txtAyuda).X,
+                alto,
+                Color.Blue);
+            botonesMenu.Add(btnAyuda);
+            ancho += (int)fuenteBotones.MeasureString(txtAyuda).X;
+
+            //Boton records
+            btnRecords = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho,
+                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+                (int)fuenteBotones.MeasureString(txtRecords).X,
+                alto,
+                Color.Red);
+            botonesMenu.Add(btnRecords);
+            ancho += (int)fuenteBotones.MeasureString(txtRecords).X;
+
+            //Boton creditos
+            btnCreditos  = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho,
+                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+                (int)fuenteBotones.MeasureString(txtCreditos).X,
+                alto,
+                Color.Blue);
+            botonesMenu.Add(btnCreditos);
         }
 
         /// <summary>
@@ -173,11 +225,21 @@ namespace ProtectTheWorld
             //dibujo el fondo
             spriteBatch.Draw(fondoMenu, new Rectangle(0, 0, AnchoPantalla, AltoPantalla), Color.White);
             //dibujo el titulo del juego
-            spriteBatch.DrawString(fuenteTitulo, titulo, new Vector2(AnchoPantalla / 2-fuenteTitulo.MeasureString(titulo).X/2, AltoPantalla / 6), Color.White);
-            //prueba set texto set imagen
-            jugar.SetTexto(txtJugar, fuenteBotones, Color.White);
+            spriteBatch.DrawString(fuenteTitulo, titulo, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            // set texto set imagen
+            btnJugar.SetTexto(txtJugar, fuenteBotones, Color.White);
+            btnOpciones.SetTexto(txtOpciones, fuenteBotones, Color.White);
+            btnAyuda.SetTexto(txtAyuda, fuenteBotones, Color.White);
+            btnRecords.SetTexto(txtRecords, fuenteBotones, Color.White);
+            btnCreditos.SetTexto(txtCreditos, fuenteBotones, Color.White);
             //jugar.SetImagen(fondoMenu);
-            jugar.Dibuja();
+            //BOTONES
+           foreach (Boton b in botonesMenu)
+            {
+                b.Dibuja();
+            }
+
+        
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ PRINCIPAL
@@ -203,9 +265,18 @@ namespace ProtectTheWorld
                         break;
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
-                        if (LevantoIzq(jugar))
+                        if (LevantoIzq(btnJugar))
                             estadoActualJuego = EstadoJuego.Gameplay;
-                            //titulo = "FUNCIONA";
+                        //titulo = "FUNCIONA";
+                        if (LevantoIzq(btnOpciones))
+                            estadoActualJuego = EstadoJuego.Opciones;
+                        if (LevantoIzq(btnAyuda))
+                            estadoActualJuego = EstadoJuego.Ayuda;
+                        if (LevantoIzq(btnRecords))
+                            estadoActualJuego = EstadoJuego.Records;
+                        if (LevantoIzq(btnCreditos))
+                            estadoActualJuego = EstadoJuego.Creditos;
+                        
                         //pongo a false las banderas de todos los botones del menu
                         foreach (Boton btn in botonesMenu)
                         {
@@ -235,19 +306,40 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ OPCIONES
         public void DibujaOpciones()
         {
-
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(fuenteTitulo, "OPCIONES", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ OPCIONES
         public void GestionaOpciones()
         {
 
         }
-        //RÉCORDS        
-        //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ RÉCORDS
 
-        public void DibujaRecords()
+        //AYUDA
+        //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ AYUDA
+        public void DibujaAyuda()
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(fuenteTitulo, "AYUDA", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.End();
+        }
+        //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ OPCIONES
+        public void GestionaAyuda()
         {
 
+        }
+
+        //RÉCORDS        
+        //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ RÉCORDS
+        public void DibujaRecords()
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(fuenteTitulo, "RECORDS", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ RÉCORDS
         public void GestionaRecords()
@@ -258,7 +350,10 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ CRÉDITOS
         public void DibujaCreditos()
         {
-
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(fuenteTitulo, "CREDITOS", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ CRÉDITOS
         public void GestionaCreditos()
