@@ -106,6 +106,7 @@
     </Compile>
     <Compile Include="Manejador.cs" />
     <Compile Include="Marciano.cs" />
+    <Compile Include="Nave.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

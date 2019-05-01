@@ -35,10 +35,11 @@ namespace ProtectTheWorld
         private Boton btnJugar, btnOpciones, btnAyuda, btnRecords, btnCreditos;
 
         //**********************JUEGO**********************
-        private int filas, columnas, nivel, primeraX, primeraY,altoMarciano,anchoMarciano;
-        private double vMarciano;
+        private int filas, columnas, nivel, primeraX, primeraY,altoMarciano,anchoMarciano,altoNave,anchoNave;
+        private double vMarciano,vBala;
         private Marciano[,] marcianos;
-        private Texture2D imgMarciano1, imgMarciano2;
+        private Texture2D imgMarciano1, imgMarciano2,imgNave,imgBala;
+        private Nave miNave;
         public Manejador()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -159,11 +160,11 @@ namespace ProtectTheWorld
             //**********************JUEGO**********************
             filas = 10;
             columnas = 5;
-            nivel = 0;
+            nivel = 0 ;
             primeraX = 0;
             primeraY = 0;
-            anchoMarciano = AnchoPantalla / 30;
-            altoMarciano = AnchoPantalla / 30;
+            anchoMarciano = AnchoPantalla / 40;
+            altoMarciano = AnchoPantalla / 40;
             vMarciano = AnchoPantalla / 100;
             marcianos = new Marciano[filas, columnas];
             imgMarciano1 = Content.Load<Texture2D>("mio1");
@@ -172,6 +173,13 @@ namespace ProtectTheWorld
             //relleno el array bidimensional de marcianos
             rellenaMarcianos();
 
+            //nave
+            vBala = 2;
+            imgBala= Content.Load<Texture2D>("proyectilnave");
+            imgNave = Content.Load<Texture2D>("nave1");
+            altoNave = AnchoPantalla / 20;
+            anchoNave = AnchoPantalla / 20;
+            miNave = new Nave(graphics, spriteBatch, imgNave, AnchoPantalla / 2 - anchoNave / 2, AltoPantalla - altoNave, anchoNave, altoNave, 2, imgBala);
 
         }
 
@@ -326,6 +334,7 @@ namespace ProtectTheWorld
                 if (m != null)
                     m.Dibujar();
             }
+            miNave.Dibujar();
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
