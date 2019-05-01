@@ -23,6 +23,7 @@ namespace ProtectTheWorld
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        private int espacio;
         private EstadoJuego estadoActualJuego;
         private ButtonState estadoClickIzq;
         private int AnchoPantalla, AltoPantalla;
@@ -48,8 +49,6 @@ namespace ProtectTheWorld
             // TODO: Add your initialization logic here
 
             base.Initialize();
-
-
             //PANTALLA COMPLETA
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
 
@@ -69,10 +68,13 @@ namespace ProtectTheWorld
         /// </summary>
         protected override void LoadContent()
         {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
             //ANCHO Y ALTO PANTALLA
             AltoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Height;
             AnchoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Width;
 
+            //**********************MENU**********************
             //STRINGS
             titulo = "Protect the World";
             txtJugar = "Jugar";
@@ -81,67 +83,69 @@ namespace ProtectTheWorld
             txtCreditos = "Creditos";
             txtRecords = "Records";
 
-            // TODO: use this.Content to load your game content here
             fondoMenu = Content.Load<Texture2D>("fondomenu");
             fuenteTitulo = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
             fuenteBotones = Content.Load<SpriteFont>("Fuentes/FuenteBotones");
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+
             //ARRAYLIST DE BOTONES
-            //MENU
             botonesMenu = new List<Boton>();    //aqui porque si lo pongo en el método instance da null reference exception
-            //punto x, punto y, alto y ancho
-            int espacio = (int)fuenteBotones.MeasureString(titulo).X -
-                ((int)fuenteBotones.MeasureString(txtJugar).X +
-                (int)fuenteBotones.MeasureString(txtOpciones).X+
-                 (int)fuenteBotones.MeasureString(txtAyuda).X+
-                  (int)fuenteBotones.MeasureString(txtRecords).X+
-                   (int)fuenteBotones.MeasureString(txtRecords).X);
+                                                //punto x, punto y, alto y ancho
+            espacio = (int)fuenteTitulo.MeasureString(titulo).X -
+               (int)fuenteBotones.MeasureString(txtJugar).X -
+               (int)fuenteBotones.MeasureString(txtOpciones).X -
+                (int)fuenteBotones.MeasureString(txtAyuda).X -
+                 (int)fuenteBotones.MeasureString(txtRecords).X -
+                  (int)fuenteBotones.MeasureString(txtCreditos).X;
             espacio = espacio / 4;
             int ancho;
             int alto = (int)fuenteBotones.MeasureString(txtJugar).Y;
             //Boton jugar
-            btnJugar = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2,
+            btnJugar = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2,
                 AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
                 (int)fuenteBotones.MeasureString(txtJugar).X,
                 alto,
-                Color.Blue);
+                Color.Transparent);
             botonesMenu.Add(btnJugar);
             ancho = (int)fuenteBotones.MeasureString(txtJugar).X;
 
             //Boton opciones
-            btnOpciones = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho,
+            btnOpciones = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
                (int)fuenteBotones.MeasureString(txtOpciones).X,
                alto,
-               Color.Red);
+               Color.Transparent);
             botonesMenu.Add(btnOpciones);
-            ancho += (int)fuenteBotones.MeasureString(txtOpciones).X;
+            ancho += (int)fuenteBotones.MeasureString(txtOpciones).X+espacio;
 
             //Boton ayuda
-            btnAyuda = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho,
+            btnAyuda = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho+espacio,
                 AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
                 (int)fuenteBotones.MeasureString(txtAyuda).X,
                 alto,
-                Color.Blue);
+                Color.Transparent);
             botonesMenu.Add(btnAyuda);
-            ancho += (int)fuenteBotones.MeasureString(txtAyuda).X;
+            ancho += (int)fuenteBotones.MeasureString(txtAyuda).X+espacio;
 
             //Boton records
-            btnRecords = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho,
+            btnRecords = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho+espacio,
                 AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
                 (int)fuenteBotones.MeasureString(txtRecords).X,
                 alto,
-                Color.Red);
+                Color.Transparent);
             botonesMenu.Add(btnRecords);
-            ancho += (int)fuenteBotones.MeasureString(txtRecords).X;
+            ancho += (int)fuenteBotones.MeasureString(txtRecords).X+espacio;
 
             //Boton creditos
-            btnCreditos  = new Boton(this.graphics, this.spriteBatch, (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho,
+            btnCreditos = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho+espacio,
                 AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
                 (int)fuenteBotones.MeasureString(txtCreditos).X,
                 alto,
-                Color.Blue);
+                Color.Transparent);
             botonesMenu.Add(btnCreditos);
         }
 
@@ -234,12 +238,10 @@ namespace ProtectTheWorld
             btnCreditos.SetTexto(txtCreditos, fuenteBotones, Color.White);
             //jugar.SetImagen(fondoMenu);
             //BOTONES
-           foreach (Boton b in botonesMenu)
+            foreach (Boton b in botonesMenu)
             {
                 b.Dibuja();
             }
-
-        
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ PRINCIPAL
@@ -276,7 +278,7 @@ namespace ProtectTheWorld
                             estadoActualJuego = EstadoJuego.Records;
                         if (LevantoIzq(btnCreditos))
                             estadoActualJuego = EstadoJuego.Creditos;
-                        
+
                         //pongo a false las banderas de todos los botones del menu
                         foreach (Boton btn in botonesMenu)
                         {
