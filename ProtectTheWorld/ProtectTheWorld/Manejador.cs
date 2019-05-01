@@ -23,6 +23,7 @@ namespace ProtectTheWorld
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        //**********************MENU**********************
         private int espacio;
         private EstadoJuego estadoActualJuego;
         private ButtonState estadoClickIzq;
@@ -32,6 +33,12 @@ namespace ProtectTheWorld
         private List<Boton> botonesMenu;
         private Texture2D fondoMenu;
         private Boton btnJugar, btnOpciones, btnAyuda, btnRecords, btnCreditos;
+
+        //**********************JUEGO**********************
+        private int filas, columnas, nivel, primeraX, primeraY,altoMarciano,anchoMarciano;
+        private double vMarciano;
+        private Marciano[,] marcianos;
+        private Texture2D imgMarciano1, imgMarciano2;
         public Manejador()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -117,36 +124,55 @@ namespace ProtectTheWorld
                alto,
                Color.Transparent);
             botonesMenu.Add(btnOpciones);
-            ancho += (int)fuenteBotones.MeasureString(txtOpciones).X+espacio;
+            ancho += (int)fuenteBotones.MeasureString(txtOpciones).X + espacio;
 
             //Boton ayuda
             btnAyuda = new Boton(this.graphics, this.spriteBatch,
-                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho+espacio,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
                 AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
                 (int)fuenteBotones.MeasureString(txtAyuda).X,
                 alto,
                 Color.Transparent);
             botonesMenu.Add(btnAyuda);
-            ancho += (int)fuenteBotones.MeasureString(txtAyuda).X+espacio;
+            ancho += (int)fuenteBotones.MeasureString(txtAyuda).X + espacio;
 
             //Boton records
             btnRecords = new Boton(this.graphics, this.spriteBatch,
-                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho+espacio,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
                 AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
                 (int)fuenteBotones.MeasureString(txtRecords).X,
                 alto,
                 Color.Transparent);
             botonesMenu.Add(btnRecords);
-            ancho += (int)fuenteBotones.MeasureString(txtRecords).X+espacio;
+            ancho += (int)fuenteBotones.MeasureString(txtRecords).X + espacio;
 
             //Boton creditos
             btnCreditos = new Boton(this.graphics, this.spriteBatch,
-                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho+espacio,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
                 AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
                 (int)fuenteBotones.MeasureString(txtCreditos).X,
                 alto,
                 Color.Transparent);
             botonesMenu.Add(btnCreditos);
+
+
+            //**********************JUEGO**********************
+            filas = 10;
+            columnas = 5;
+            nivel = 0;
+            primeraX = 0;
+            primeraY = 0;
+            anchoMarciano = AnchoPantalla / 30;
+            altoMarciano = AnchoPantalla / 30;
+            vMarciano = AnchoPantalla / 100;
+            marcianos = new Marciano[filas, columnas];
+            imgMarciano1 = Content.Load<Texture2D>("mio1");
+            imgMarciano2 = Content.Load<Texture2D>("mio2");
+
+            //relleno el array bidimensional de marcianos
+            rellenaMarcianos();
+
+
         }
 
         /// <summary>
@@ -295,7 +321,11 @@ namespace ProtectTheWorld
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
-            spriteBatch.DrawString(fuenteTitulo, "GAMEPLAY", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            foreach (Marciano m in marcianos)
+            {
+                if (m != null)
+                    m.Dibujar();
+            }
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
@@ -303,6 +333,57 @@ namespace ProtectTheWorld
         {
 
         }
+        //Método que será llamado cuando no haya más marcianos en el arraybidimensional. 
+        //Incrementa el nivel y se encarga de rellenar de marcianos el array bidimensional dependiendo del nivel en el que estemos.
+        //También se encarga de aumentar la velocidad de los marcianos en el momento adecuado
+        public void rellenaMarcianos()
+        {
+            try
+            {
+                //incremento el nivel
+                nivel++;
+                //recorro las filas
+                for (int i = 0; i < marcianos.Length; i++)
+                {
+                    //incremento la pos y
+                    primeraY += altoMarciano*2;
+                    //recorro las columnas
+                    for (int j = 0; j < marcianos.GetLength(0); j++)
+                    {
+                        //dependiendo del nivel y de la fila en la que esté
+                        //pongo un marciano nivel 1 o marciano nivel 2
+                        //por ejemplo, si estoy en la ultima fila y en el nivel 2-1, sera de marcianos de dos impactos
+                        if (i >= marcianos.Length - (nivel - 1))
+                        {
+                            marcianos[j,i] = new Marciano(graphics, spriteBatch, imgMarciano2, primeraX, primeraY,anchoMarciano,altoMarciano, 2, vMarciano, 25);
+                        }
+                        else
+                        {
+                            marcianos[j,i] = new Marciano(graphics, spriteBatch, imgMarciano1, primeraX, primeraY, anchoMarciano, altoMarciano, 1, vMarciano, 10);
+                        }
+                        //aumento la posX
+                        primeraX +=anchoMarciano*2;
+                    }
+                    //una vez recorro todas las columnas de la fila actual
+                    primeraX = 0;
+                }
+                //una vez recorro todas las filas y columnas
+                primeraY = 0;
+                //si el nivel - 1 es igual al numero de filas, es decir, he llegado a cubrir la pantalla de marcianos de dos impactos
+                if (nivel - 1 == filas)
+                {
+                    nivel = 0;
+                    vMarciano = vMarciano * 2;
+                }
+            }
+            catch
+            {
+
+            }
+
+        }
+
+
 
         //OPCIONES
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ OPCIONES
@@ -378,6 +459,10 @@ namespace ProtectTheWorld
         {
             if (b.GetBandera() && b.GetContenedor().Contains(new Point(Mouse.GetState().X, Mouse.GetState().Y))) return true;
             return false;
+        }
+
+        public void TeclaPulsada()
+        {
         }
     }
 }
