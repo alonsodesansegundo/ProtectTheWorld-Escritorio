@@ -55,6 +55,8 @@ namespace ProtectTheWorld
 
         public int getSalud() { return this.salud; }
 
+        public void setSalud(int valor) { this.salud = valor; }
+
 
         //------------------------MOVIMIENTO DE LOS MARCIANOS------------------------
         //metodo mover abajo

@@ -37,7 +37,8 @@ namespace ProtectTheWorld
         private Boton btnJugar, btnOpciones, btnAyuda, btnRecords, btnCreditos;
 
         //**********************JUEGO**********************
-        private int filas, columnas, nivel, primeraX, primeraY, altoMarciano, anchoMarciano, altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave;
+        private int filas, columnas, nivel, primeraX, primeraY, altoMarciano, anchoMarciano,
+            altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave,puntuacionGlobal;
         private double vMarciano, vBala;
         private Marciano[,] marcianos;
         private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala;
@@ -162,6 +163,7 @@ namespace ProtectTheWorld
 
 
             //**********************JUEGO**********************
+            puntuacionGlobal = 0;
             //marcianos
             filas = 5;
             columnas = 10;
@@ -402,16 +404,42 @@ namespace ProtectTheWorld
                     for (int j = 0; j < marcianos.GetLength(1); j++)
                     {
                         //si hay un marciano
-                        if(marcianos[i, j] != null)
+                        if (marcianos[i, j] != null)
                         {
+                            //si la bala impacta en un marciano
                             if (marcianos[i, j].getContenedor().Intersects(miNave.getBala()))
                             {
+                                //le resto uno de salud al marciano
+                                marcianos[i, j].setSalud(marcianos[i, j].getSalud() - 1);
+                                //si salud es cero
+                                if (marcianos[i, j].getSalud() == 0)
+                                {
+
+                                    //sumo a mi puntuacion global los puntos del marciano
+                                    puntuacionGlobal += marcianos[i, j].getPuntuacion();
+                                    //elimino el marciano
+                                    marcianos[i, j] = null;
+                                }
+                                else
+                                {
+                                    //si continua con salud
+                                    //cambio la imagen del marciano por una de marciano nivel 1
+                                    marcianos[i,j].setImagen(imgMarciano1);
+                                }
+                                //quito la bala
                                 miNave.setHayBala(false);
-                                marcianos[i, j] = null;
+
+                                //si no hay marcianos
+                                //relleno el array segun el nivel, de ello se encarga rellena marcianos
+                                if (!hayMarcianos())
+                                {
+                                    //vaciaBalas();
+                                    rellenaMarcianos();
+                                }
+                                //salgo del bucle porque no hace falta seguir recorriendo todos los marcianos, ya que solo es posible que haya un impacto
                                 break;
                             }
                         }
-                       
                     }
                 }
 
@@ -466,6 +494,22 @@ namespace ProtectTheWorld
 
             }
 
+        }
+
+        public bool hayMarcianos()
+        {
+            for (int i = 0; i < marcianos.GetLength(0); i++)
+            {
+                for (int j = 0; j < marcianos.GetLength(1); j++)
+                {
+                    if (marcianos[i,j] != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+            //si no he encontrado ningun null
+            return false;
         }
         //------------------------MOVIMIENTO VERTICAL Y HORIZONTAL DE LOS MARCIANOS------------------------
 
