@@ -13,7 +13,8 @@ namespace ProtectTheWorld
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         //propiedades
-        private Point pos;
+        //private Point pos;
+        private int X, Y;
         private Texture2D imagen;
         private Rectangle contenedor;
         private bool hayBala;
@@ -22,24 +23,32 @@ namespace ProtectTheWorld
         private double vBala;
         private int ancho;
         private int alto;
+        private int anchoBala;
+        private int altoBala;
 
         //constructor
-        public Nave(GraphicsDeviceManager graphics, SpriteBatch spriteBatch, Texture2D imagen, int x, int y, int ancho, int alto, double velocidadBala, Texture2D imgBala)
+        public Nave(GraphicsDeviceManager graphics, SpriteBatch spriteBatch, Texture2D imagen, int x, int y, int ancho, int alto, 
+            int anchoBala,int altoBala,double velocidadBala, Texture2D imgBala)
         {
             this.graphics = graphics;
             this.spriteBatch = spriteBatch;
 
-            this.pos = new Point(x, y);
+            //this.pos = new Point(x, y);
+            this.X = x;
+            this.Y = y;
             this.imagen = imagen;
             this.hayBala = false;
             this.vBala = velocidadBala;
             this.imgBala = imgBala;
-            this.contenedor = new Rectangle(pos.X, pos.Y, ancho, alto);
+            this.contenedor = new Rectangle(this.X, this.Y, ancho, alto);
             this.ancho = ancho;
             this.alto = alto;
+            this.anchoBala = anchoBala;
+            this.altoBala = altoBala;
         }
 
         //------------------------GETTER AND SETTER------------------------
+        public int getX() { return this.X; }
         public bool getHayBala() { return this.hayBala; }
 
         public void setImagen(Texture2D imgagen) { this.imagen = imgagen; }
@@ -52,14 +61,22 @@ namespace ProtectTheWorld
 
         public Rectangle getBala() { return this.bala; }
 
+        //public Point getPos() { return this.pos; }
+
+        //public void setX(int X) { pos.X = X; }
+
         //------------------------MOVER LA NAVE EN EL EJE X------------------------
         //metodo al que le paso la posicion x y se encarga de mover la nave (su pos x)
-        public void moverNave(int nuevaX)
+        public void moverNave(int nuevaX,int limite)
         {
-            this.pos.X = nuevaX - ancho / 2;
-            //contenedor.right = pos.x + imagen.Width;
+            //this.pos.x = nuevaX - imagen.getWidth() / 2;
+            //contenedor.right = pos.x + imagen.getWidth();
             //contenedor.left = pos.x;
-            contenedor.X = pos.X + imagen.Width;
+            if(nuevaX>0 && nuevaX < limite)
+            {
+                this.X = nuevaX;
+                this.contenedor = new Rectangle(this.X, this.Y, ancho, alto);
+            }
         }
 
         //------------------------DISPARO DE LA NAVE------------------------
@@ -68,7 +85,7 @@ namespace ProtectTheWorld
             if (!hayBala)
             {
                 //genero el proyectil a traves de la posicion de la nave
-                bala = new Rectangle(contenedor.Center.X - imgBala.Width / 2, pos.Y - imgBala.Height, contenedor.Center.X + imgBala.Width / 2, pos.Y);
+                bala = new Rectangle(this.X +ancho/2-anchoBala/2, this.Y-altoBala , this.anchoBala, this.altoBala);
                 hayBala = true;
                 return true;
             }
@@ -103,6 +120,7 @@ namespace ProtectTheWorld
                 spriteBatch.Draw(this.imgBala, this.bala, Color.White);
             }
             spriteBatch.Draw(this.imagen, this.contenedor, Color.White);
+
         }
     }
 }

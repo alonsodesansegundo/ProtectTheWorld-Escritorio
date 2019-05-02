@@ -20,9 +20,11 @@ namespace ProtectTheWorld
     /// </summary>
     public class Manejador : Game
     {
+        //GENERAL
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        private KeyboardState teclado;
         //**********************MENU**********************
         private int espacio;
         private EstadoJuego estadoActualJuego;
@@ -35,11 +37,12 @@ namespace ProtectTheWorld
         private Boton btnJugar, btnOpciones, btnAyuda, btnRecords, btnCreditos;
 
         //**********************JUEGO**********************
-        private int filas, columnas, nivel, primeraX, primeraY,altoMarciano,anchoMarciano,altoNave,anchoNave;
-        private double vMarciano,vBala;
+        private int filas, columnas, nivel, primeraX, primeraY, altoMarciano, anchoMarciano, altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave;
+        private double vMarciano, vBala;
         private Marciano[,] marcianos;
-        private Texture2D imgMarciano1, imgMarciano2,imgNave,imgBala;
+        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala;
         private Nave miNave;
+        private bool voyIzquierda, voyAbajo;
         public Manejador()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -57,6 +60,7 @@ namespace ProtectTheWorld
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
             //PANTALLA COMPLETA
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
 
@@ -158,9 +162,10 @@ namespace ProtectTheWorld
 
 
             //**********************JUEGO**********************
-            filas = 10;
-            columnas = 5;
-            nivel = 0 ;
+            //marcianos
+            filas = 5;
+            columnas = 10;
+            nivel = 0;
             primeraX = 0;
             primeraY = 0;
             anchoMarciano = AnchoPantalla / 40;
@@ -173,13 +178,21 @@ namespace ProtectTheWorld
             //relleno el array bidimensional de marcianos
             rellenaMarcianos();
 
+            voyAbajo = false;
+            voyIzquierda = false;
+
             //nave
+            vNave = 10;
             vBala = 2;
-            imgBala= Content.Load<Texture2D>("proyectilnave");
+            imgBala = Content.Load<Texture2D>("proyectilnave");
             imgNave = Content.Load<Texture2D>("nave1");
             altoNave = AnchoPantalla / 20;
             anchoNave = AnchoPantalla / 20;
-            miNave = new Nave(graphics, spriteBatch, imgNave, AnchoPantalla / 2 - anchoNave / 2, AltoPantalla - altoNave, anchoNave, altoNave, 2, imgBala);
+            altoProyectilNave = altoNave;
+            anchoProyectilNave = anchoNave / 2;
+            miNave = new Nave(graphics, spriteBatch, imgNave,
+                AnchoPantalla / 2 - anchoNave / 2, AltoPantalla - altoNave, anchoNave, altoNave,
+               anchoProyectilNave, altoProyectilNave, 2, imgBala);
 
         }
 
@@ -281,6 +294,13 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ PRINCIPAL
         public void GestionaMenu()
         {
+            //TECLADO
+            teclado = Keyboard.GetState();
+            //si pulsa la tecla ESC
+            if (teclado.IsKeyDown(Keys.Escape))
+            {
+                this.Exit();
+            }
             //si cambia el estado del click izq
             if (estadoClickIzq != Mouse.GetState().LeftButton)
             {
@@ -340,8 +360,64 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
         public void GestionaJuego()
         {
+            //TECLADO
+            teclado = Keyboard.GetState();
+            //CONFIGURACION FLECHAS
+            //SI PULSA FLECHA ABAJO
+            if (teclado.IsKeyDown(Keys.Down))
+                estadoActualJuego = EstadoJuego.Menu;
+            //SI PULSA LA FLECHA DRCH
+            if (teclado.IsKeyDown(Keys.Right) && (!teclado.IsKeyUp(Keys.Right)))
+                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+            //SI PULSA LA FLECHA IZQ
+            if (teclado.IsKeyDown(Keys.Left) && (!teclado.IsKeyUp(Keys.Left)))
+                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+            //SI PULSA FLECHA ARRIBA
+            if (teclado.IsKeyDown(Keys.Up))
+                miNave.disparar();
 
+            //CONFIGURACION ALTERNATIVA
+            //SI PULSA W
+            if (teclado.IsKeyDown(Keys.S))
+                estadoActualJuego = EstadoJuego.Menu;
+            //SI PULSA LA D
+            if (teclado.IsKeyDown(Keys.D) && (!teclado.IsKeyUp(Keys.D)))
+                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+            //SI PULSA LA A
+            if (teclado.IsKeyDown(Keys.A) && (!teclado.IsKeyUp(Keys.A)))
+                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+            //SI PULSA FLECHA ARRIBA
+            if (teclado.IsKeyDown(Keys.W))
+                miNave.disparar();
+
+
+            //SI HAY BALA EN PANTALLA
+            if (miNave.getHayBala())
+            {
+                //ACTUALIZO EL PROYECTIL
+                miNave.actualizaProyectil();
+                //RECORRO LOS MARCIANOS PARA VER SI HE IMPACTADO EN ALGUNO
+                for (int i = 0; i < marcianos.GetLength(0); i++)
+                {
+                    for (int j = 0; j < marcianos.GetLength(1); j++)
+                    {
+                        //si hay un marciano
+                        if(marcianos[i, j] != null)
+                        {
+                            if (marcianos[i, j].getContenedor().Intersects(miNave.getBala()))
+                            {
+                                miNave.setHayBala(false);
+                                marcianos[i, j] = null;
+                                break;
+                            }
+                        }
+                       
+                    }
+                }
+
+            }
         }
+
         //Método que será llamado cuando no haya más marcianos en el arraybidimensional. 
         //Incrementa el nivel y se encarga de rellenar de marcianos el array bidimensional dependiendo del nivel en el que estemos.
         //También se encarga de aumentar la velocidad de los marcianos en el momento adecuado
@@ -352,26 +428,26 @@ namespace ProtectTheWorld
                 //incremento el nivel
                 nivel++;
                 //recorro las filas
-                for (int i = 0; i < marcianos.Length; i++)
+                for (int i = 0; i < marcianos.GetLength(0); i++)
                 {
                     //incremento la pos y
-                    primeraY += altoMarciano*2;
+                    primeraY += altoMarciano * 2;
                     //recorro las columnas
-                    for (int j = 0; j < marcianos.GetLength(0); j++)
+                    for (int j = 0; j < marcianos.GetLength(1); j++)
                     {
                         //dependiendo del nivel y de la fila en la que esté
                         //pongo un marciano nivel 1 o marciano nivel 2
                         //por ejemplo, si estoy en la ultima fila y en el nivel 2-1, sera de marcianos de dos impactos
-                        if (i >= marcianos.Length - (nivel - 1))
+                        if (i >= marcianos.GetLength(0) - (nivel - 1))
                         {
-                            marcianos[j,i] = new Marciano(graphics, spriteBatch, imgMarciano2, primeraX, primeraY,anchoMarciano,altoMarciano, 2, vMarciano, 25);
+                            marcianos[i, j] = new Marciano(graphics, spriteBatch, imgMarciano2, primeraX, primeraY, anchoMarciano, altoMarciano, 2, vMarciano, 25);
                         }
                         else
                         {
-                            marcianos[j,i] = new Marciano(graphics, spriteBatch, imgMarciano1, primeraX, primeraY, anchoMarciano, altoMarciano, 1, vMarciano, 10);
+                            marcianos[i, j] = new Marciano(graphics, spriteBatch, imgMarciano1, primeraX, primeraY, anchoMarciano, altoMarciano, 1, vMarciano, 10);
                         }
                         //aumento la posX
-                        primeraX +=anchoMarciano*2;
+                        primeraX += anchoMarciano * 2;
                     }
                     //una vez recorro todas las columnas de la fila actual
                     primeraX = 0;
@@ -391,11 +467,9 @@ namespace ProtectTheWorld
             }
 
         }
+        //------------------------MOVIMIENTO VERTICAL Y HORIZONTAL DE LOS MARCIANOS------------------------
 
 
-
-        //OPCIONES
-        //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ OPCIONES
         public void DibujaOpciones()
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
