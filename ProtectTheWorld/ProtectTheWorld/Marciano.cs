@@ -21,7 +21,8 @@ namespace ProtectTheWorld
         private int puntuacion;
 
         //constructor
-        public Marciano(GraphicsDeviceManager graphics, SpriteBatch spriteBatch, Texture2D imagen, int x, int y,int ancho,int alto, int salud, double velocidad, int puntuacion)
+        public Marciano(GraphicsDeviceManager graphics, SpriteBatch spriteBatch, Texture2D imagen, int x, int y,int ancho,int alto,
+            int salud, double velocidad, int puntuacion)
         {
             this.graphics = graphics;
             this.spriteBatch = spriteBatch;
@@ -65,7 +66,7 @@ namespace ProtectTheWorld
             if (abajo)
             {
                 //aumento la posY el alto de la imagen
-                this.pos.Y += imagen.Height / 2;
+                this.pos.Y += this.alto;
                 //actualizo el contenedor
                 this.contenedor.Y = this.pos.Y;
 
@@ -110,7 +111,7 @@ namespace ProtectTheWorld
 
         public bool limiteDerecha(int anchoPantalla)
         {
-            if (this.pos.X >= anchoPantalla - imagen.Width)
+            if (this.pos.X >= anchoPantalla -this.ancho)
                 return true;
             return false;
         }

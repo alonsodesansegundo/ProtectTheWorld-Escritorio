@@ -172,7 +172,7 @@ namespace ProtectTheWorld
             primeraY = 0;
             anchoMarciano = AnchoPantalla / 40;
             altoMarciano = AnchoPantalla / 40;
-            vMarciano = AnchoPantalla / 100;
+            vMarciano = 1;
             marcianos = new Marciano[filas, columnas];
             imgMarciano1 = Content.Load<Texture2D>("mio1");
             imgMarciano2 = Content.Load<Texture2D>("mio2");
@@ -185,16 +185,16 @@ namespace ProtectTheWorld
 
             //nave
             vNave = 10;
-            vBala = 2;
+            vBala = 6;
             imgBala = Content.Load<Texture2D>("proyectilnave");
             imgNave = Content.Load<Texture2D>("nave1");
             altoNave = AnchoPantalla / 20;
             anchoNave = AnchoPantalla / 20;
-            altoProyectilNave = altoNave;
-            anchoProyectilNave = anchoNave / 2;
+            altoProyectilNave = altoNave/2;
+            anchoProyectilNave = anchoNave / 4;
             miNave = new Nave(graphics, spriteBatch, imgNave,
                 AnchoPantalla / 2 - anchoNave / 2, AltoPantalla - altoNave, anchoNave, altoNave,
-               anchoProyectilNave, altoProyectilNave, 2, imgBala);
+               anchoProyectilNave, altoProyectilNave, vBala, imgBala);
 
         }
 
@@ -349,101 +349,40 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE DIBUJAR EL JUEGO
         public void DibujaJuego()
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            //dibujo el fondo negro
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
+            //dibujo la puntuacion
+            spriteBatch.DrawString(fuenteBotones,
+                puntuacionGlobal.ToString(), 
+                new Vector2(AnchoPantalla/2- fuenteBotones.MeasureString(puntuacionGlobal.ToString()).X / 2,
+                fuenteBotones.MeasureString(puntuacionGlobal.ToString()).Y),
+                Color.White);
+            //dibujo los marcianos
             foreach (Marciano m in marcianos)
             {
                 if (m != null)
                     m.Dibujar();
             }
+            //dibujo la nave
             miNave.Dibujar();
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
         public void GestionaJuego()
         {
+
             //TECLADO
-            teclado = Keyboard.GetState();
-            //CONFIGURACION FLECHAS
-            //SI PULSA FLECHA ABAJO
-            if (teclado.IsKeyDown(Keys.Down))
-                estadoActualJuego = EstadoJuego.Menu;
-            //SI PULSA LA FLECHA DRCH
-            if (teclado.IsKeyDown(Keys.Right) && (!teclado.IsKeyUp(Keys.Right)))
-                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
-            //SI PULSA LA FLECHA IZQ
-            if (teclado.IsKeyDown(Keys.Left) && (!teclado.IsKeyUp(Keys.Left)))
-                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
-            //SI PULSA FLECHA ARRIBA
-            if (teclado.IsKeyDown(Keys.Up))
-                miNave.disparar();
+            gestionaTeclado();
 
-            //CONFIGURACION ALTERNATIVA
-            //SI PULSA W
-            if (teclado.IsKeyDown(Keys.S))
-                estadoActualJuego = EstadoJuego.Menu;
-            //SI PULSA LA D
-            if (teclado.IsKeyDown(Keys.D) && (!teclado.IsKeyUp(Keys.D)))
-                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
-            //SI PULSA LA A
-            if (teclado.IsKeyDown(Keys.A) && (!teclado.IsKeyUp(Keys.A)))
-                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
-            //SI PULSA FLECHA ARRIBA
-            if (teclado.IsKeyDown(Keys.W))
-                miNave.disparar();
+            //MOVIMIENTO BALA NAVE
+            mueveBalaNave();
+            
+            //BANDERAS MOVIMIENTO MARCIANOS
+            actualizaBanderasMovimiento();
 
-
-            //SI HAY BALA EN PANTALLA
-            if (miNave.getHayBala())
-            {
-                //ACTUALIZO EL PROYECTIL
-                miNave.actualizaProyectil();
-                //RECORRO LOS MARCIANOS PARA VER SI HE IMPACTADO EN ALGUNO
-                for (int i = 0; i < marcianos.GetLength(0); i++)
-                {
-                    for (int j = 0; j < marcianos.GetLength(1); j++)
-                    {
-                        //si hay un marciano
-                        if (marcianos[i, j] != null)
-                        {
-                            //si la bala impacta en un marciano
-                            if (marcianos[i, j].getContenedor().Intersects(miNave.getBala()))
-                            {
-                                //le resto uno de salud al marciano
-                                marcianos[i, j].setSalud(marcianos[i, j].getSalud() - 1);
-                                //si salud es cero
-                                if (marcianos[i, j].getSalud() == 0)
-                                {
-
-                                    //sumo a mi puntuacion global los puntos del marciano
-                                    puntuacionGlobal += marcianos[i, j].getPuntuacion();
-                                    //elimino el marciano
-                                    marcianos[i, j] = null;
-                                }
-                                else
-                                {
-                                    //si continua con salud
-                                    //cambio la imagen del marciano por una de marciano nivel 1
-                                    marcianos[i,j].setImagen(imgMarciano1);
-                                }
-                                //quito la bala
-                                miNave.setHayBala(false);
-
-                                //si no hay marcianos
-                                //relleno el array segun el nivel, de ello se encarga rellena marcianos
-                                if (!hayMarcianos())
-                                {
-                                    //vaciaBalas();
-                                    rellenaMarcianos();
-                                }
-                                //salgo del bucle porque no hace falta seguir recorriendo todos los marcianos, ya que solo es posible que haya un impacto
-                                break;
-                            }
-                        }
-                    }
-                }
-
-            }
+            //MOVIMIENTO MARCIANOS
+            mueveMarcianos();
         }
 
         //Método que será llamado cuando no haya más marcianos en el arraybidimensional. 
@@ -511,8 +450,169 @@ namespace ProtectTheWorld
             //si no he encontrado ningun null
             return false;
         }
-        //------------------------MOVIMIENTO VERTICAL Y HORIZONTAL DE LOS MARCIANOS------------------------
 
+        public void gestionaTeclado()
+        {
+            //TECLADO
+            teclado = Keyboard.GetState();
+            //CONFIGURACION FLECHAS
+            //SI PULSA FLECHA ABAJO
+            if (teclado.IsKeyDown(Keys.Down))
+                estadoActualJuego = EstadoJuego.Menu;
+            //SI PULSA LA FLECHA DRCH
+            if (teclado.IsKeyDown(Keys.Right) && (!teclado.IsKeyUp(Keys.Right)))
+                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+            //SI PULSA LA FLECHA IZQ
+            if (teclado.IsKeyDown(Keys.Left) && (!teclado.IsKeyUp(Keys.Left)))
+                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+            //SI PULSA FLECHA ARRIBA
+            if (teclado.IsKeyDown(Keys.Up))
+                miNave.disparar();
+
+            //CONFIGURACION ALTERNATIVA
+            //SI PULSA W
+            if (teclado.IsKeyDown(Keys.S))
+                estadoActualJuego = EstadoJuego.Menu;
+            //SI PULSA LA D
+            if (teclado.IsKeyDown(Keys.D) && (!teclado.IsKeyUp(Keys.D)))
+                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+            //SI PULSA LA A
+            if (teclado.IsKeyDown(Keys.A) && (!teclado.IsKeyUp(Keys.A)))
+                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+            //SI PULSA FLECHA ARRIBA
+            if (teclado.IsKeyDown(Keys.W))
+                miNave.disparar();
+        }
+
+        public void mueveBalaNave()
+        {
+            //SI HAY BALA EN PANTALLA
+            if (miNave.getHayBala())
+            {
+                //ACTUALIZO EL PROYECTIL
+                miNave.actualizaProyectil();
+                //RECORRO LOS MARCIANOS PARA VER SI HE IMPACTADO EN ALGUNO
+                for (int i = 0; i < marcianos.GetLength(0); i++)
+                {
+                    for (int j = 0; j < marcianos.GetLength(1); j++)
+                    {
+                        //si hay un marciano
+                        if (marcianos[i, j] != null)
+                        {
+                            //si la bala impacta en un marciano
+                            if (marcianos[i, j].getContenedor().Intersects(miNave.getBala()))
+                            {
+                                //le resto uno de salud al marciano
+                                marcianos[i, j].setSalud(marcianos[i, j].getSalud() - 1);
+                                //si salud es cero
+                                if (marcianos[i, j].getSalud() == 0)
+                                {
+
+                                    //sumo a mi puntuacion global los puntos del marciano
+                                    puntuacionGlobal += marcianos[i, j].getPuntuacion();
+                                    //elimino el marciano
+                                    marcianos[i, j] = null;
+                                }
+                                else
+                                {
+                                    //si continua con salud
+                                    //cambio la imagen del marciano por una de marciano nivel 1
+                                    marcianos[i, j].setImagen(imgMarciano1);
+                                }
+                                //quito la bala
+                                miNave.setHayBala(false);
+
+                                //si no hay marcianos
+                                //relleno el array segun el nivel, de ello se encarga rellena marcianos
+                                if (!hayMarcianos())
+                                {
+                                    //vaciaBalas();
+                                    rellenaMarcianos();
+                                }
+                                //salgo del bucle porque no hace falta seguir recorriendo todos los marcianos, ya que solo es posible que haya un impacto
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //------------------------MOVIMIENTO VERTICAL Y HORIZONTAL DE LOS MARCIANOS------------------------
+        public void actualizaBanderasMovimiento()
+        {
+            //aqui veré en que dirección tienen que ir los marcianos (izq o drch) -> bandera voyIzquierda
+            //también veré si descienden un nivel o no -> bandera voy abajo
+            //recorro las filas de marcianos
+            for (int i = 0; i < marcianos.GetLength(0); i++)
+            {
+                //recorro las columnas
+                for (int j = 0; j < marcianos.GetLength(1); j++)
+                {
+                    //si hay un marciano
+                    if (marcianos[i,j] != null)
+                    {
+                        //si un marciano llega al limite de la derecha
+                        if (marcianos[i,j].limiteDerecha(AnchoPantalla))
+                        {
+                            //bandera voy abajo a true
+                            voyAbajo = true;
+                            //pongo la bandera voyIzquierda a true
+                            voyIzquierda = true;
+                            //salgo del for porque uno de ellos a llegado al limite
+                            break;
+                        }
+                        else
+                        {
+                            //si no llegue al limite por la derecha, miro si llegue al limite por la izquierda
+                            if (marcianos[i,j].limiteIzquierda())
+                            {
+                                //bandera voy abajo a true
+                                voyAbajo = true;
+                                //pongo la bandera voyIzquierda a false
+                                voyIzquierda = false;
+                                //salgo del for porque uno de ellos a llegado al limite
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        public void mueveMarcianos()
+        {
+            //recorro las filas
+            for (int i = 0; i < marcianos.GetLength(0); i++)
+            {
+                //recorro las columnas
+                for (int j = 0; j < marcianos.GetLength(1); j++)
+                {
+                    //si hay un marciano
+                    if (marcianos[i,j] != null)
+                    {
+                        //lo muevo de manera lateral segun en que dirección tengo que ir
+                        marcianos[i,j].moverLateral(voyIzquierda);
+                        //en caso de tener que descender un nivel, lo hace
+                        marcianos[i,j].moverAbajo(voyAbajo);
+                        if (marcianos[i,j].limiteAbajo(AltoPantalla - miNave.getAlto()))
+                        {
+                            //if (mejoraPuntuacion())
+                            //{
+                            //    pideSiglas = true;
+                            //}
+                            //else
+                            //{
+                            //    perdi = true;
+                            //}
+                            //estoyJugando = false;
+                        }
+                    }
+                }
+            }
+            //después de mover todos los marcianos
+            //pongo la bandera voyAbajo a false
+            voyAbajo = false;
+        }
 
         public void DibujaOpciones()
         {

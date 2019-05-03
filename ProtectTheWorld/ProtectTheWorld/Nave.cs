@@ -61,6 +61,8 @@ namespace ProtectTheWorld
 
         public Rectangle getBala() { return this.bala; }
 
+        public int getAlto() { return this.alto; }
+
         //public Point getPos() { return this.pos; }
 
         //public void setX(int X) { pos.X = X; }
