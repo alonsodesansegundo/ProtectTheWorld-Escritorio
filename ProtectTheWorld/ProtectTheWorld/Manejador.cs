@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections;
 using System.Collections.Generic;
 using Windows.UI.ViewManagement;
 
@@ -38,10 +39,14 @@ namespace ProtectTheWorld
 
         //**********************JUEGO**********************
         private int filas, columnas, nivel, primeraX, primeraY, altoMarciano, anchoMarciano,
-            altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave,puntuacionGlobal;
+            altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave,
+            puntuacionGlobal,auxiliar,anchoProyectilMarciano,altoProyectilMarciano;
         private double vMarciano, vBala;
         private Marciano[,] marcianos;
-        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala;
+        private ArrayList misColumnas;
+        List<BalaMarciano> balasMarcianos;
+
+        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala,imgBalaMarciano,explosion;
         private Nave miNave;
         private bool voyIzquierda, voyAbajo;
         public Manejador()
@@ -163,6 +168,7 @@ namespace ProtectTheWorld
 
 
             //**********************JUEGO**********************
+            auxiliar = 0;
             puntuacionGlobal = 0;
             //marcianos
             filas = 5;
@@ -172,8 +178,12 @@ namespace ProtectTheWorld
             primeraY = 0;
             anchoMarciano = AnchoPantalla / 40;
             altoMarciano = AnchoPantalla / 40;
+            anchoProyectilMarciano = anchoMarciano / 2;
+            altoProyectilMarciano = altoMarciano / 2;
             vMarciano = 1;
             marcianos = new Marciano[filas, columnas];
+            balasMarcianos = new List<BalaMarciano>();
+            misColumnas = new ArrayList();
             imgMarciano1 = Content.Load<Texture2D>("mio1");
             imgMarciano2 = Content.Load<Texture2D>("mio2");
 
@@ -187,7 +197,9 @@ namespace ProtectTheWorld
             vNave = 10;
             vBala = 6;
             imgBala = Content.Load<Texture2D>("proyectilnave");
+            imgBalaMarciano= Content.Load<Texture2D>("bombamarciano");
             imgNave = Content.Load<Texture2D>("nave1");
+            explosion =Content.Load<Texture2D>("explosion");
             altoNave = AnchoPantalla / 20;
             anchoNave = AnchoPantalla / 20;
             altoProyectilNave = altoNave/2;
@@ -364,6 +376,12 @@ namespace ProtectTheWorld
                 if (m != null)
                     m.Dibujar();
             }
+            //dibujo todas las balas marcianos
+            for (int i = 0; i < balasMarcianos.Count; i++)
+            {
+                balasMarcianos[i].Dibuja();
+            }
+
             //dibujo la nave
             miNave.Dibujar();
             spriteBatch.End();
@@ -371,7 +389,14 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
         public void GestionaJuego()
         {
-
+            auxiliar++;
+            //BALAS MARCIANOS
+            if (auxiliar == 100)
+            {
+                auxiliar = 0;
+                disparanMarcianos();
+            }
+            actualizaBalasMarcianos();
             //TECLADO
             gestionaTeclado();
 
@@ -537,6 +562,96 @@ namespace ProtectTheWorld
                 }
             }
         }
+
+        //------------------------DISPARO MARCIANOS------------------------
+        public void disparanMarcianos()
+        {
+            //solo podrán disparar los últimos marcianos de cada columna
+            //recorro las filas de abajo a arriba
+            for (int i = marcianos.GetLength(0) - 1; i >= 0; i--)
+            {
+                //recorro las columnas de izq a drch
+                for (int j = 0; j < marcianos.GetLength(1); j++)
+                {
+                    //si esa columna no está en mi arraylist de columnas y en la posicion actual hay un marciano
+                    if (misColumnas.IndexOf(j) == -1 && marcianos[i,j] != null)
+                    {
+                        //añado la columna a mi arraylist
+                        misColumnas.Add(j);
+                        //si se decide que el marciano dispare (porque sale x probabilidad)
+                        if (marcianos[i,j].dispara(50))
+                        {
+                            //genero una nueva bala marciano que añado a su array
+                            balasMarcianos.Add(new BalaMarciano(graphics,spriteBatch,(int)marcianos[i,j].getContenedor().Center.X -
+                                    anchoProyectilMarciano / 2,
+                                    (int)marcianos[i,j].getPos().Y + altoMarciano,
+                                    anchoProyectilMarciano,
+                                   altoProyectilMarciano, imgBalaMarciano, 5));
+                        }
+                    }
+                }
+            }
+            //limpio el arraylist que uso de contenedor de las columnas
+            misColumnas.Clear();
+        }
+
+        //------------------------MOVIMIENTO BALAS MARCIANOS------------------------
+        public void actualizaBalasMarcianos()
+        {
+            //además de mover las balas, gestiono si chocan o no con la nave, y si desaparecen de la pantalla las elimino
+            //de atrás alante para no tener problemas al eliminar
+            for (int i = balasMarcianos.Count - 1; i >= 0; i--)
+            {
+                //muevo la bala actual hacia abajo
+                balasMarcianos[i].bajar();
+                //si choca con la nave
+                if (balasMarcianos[i].getContenedor().Intersects(miNave.getContenedor()))
+                {
+
+                    miNave.setImagen(explosion);
+                    //perdi
+                    //estoyJugando = false;
+                    //mueveNave = false;
+                    //acabaMusica();
+                    //if (mejoraPuntuacion())
+                    //{
+                    //    pideSiglas = true;
+                    //}
+                    //else
+                    //{
+                    //    perdi = true;
+                    //}
+                }
+                else
+                {
+                    //si no ha chocado con la nave
+                    //veo si ha chocado o no con la bala de la nave, si es asi, elimino ambas balas
+                    if (balasMarcianos[i].getContenedor().Intersects(miNave.getBala()))
+                    {
+
+                        //elimino ambas balas
+                        //elimino la bala marciano
+                        balasMarcianos.Remove(balasMarcianos[i]);
+
+                        //elimino la bala de la nave
+                        miNave.setHayBala(false);
+
+                        //si no choca con la nave ni con la bala de la nave
+                    }
+                    else
+                    {
+                        //veo si desaparece de la pantalla, si es así
+                        if (balasMarcianos[i].getContenedor().Y >= AltoPantalla)
+                        {
+                            //la elimino para no mover balas que no se ven
+                            balasMarcianos.Remove(balasMarcianos[i]);
+                        }
+                    }
+
+                }
+            }
+        }
+
         //------------------------MOVIMIENTO VERTICAL Y HORIZONTAL DE LOS MARCIANOS------------------------
         public void actualizaBanderasMovimiento()
         {
