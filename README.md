@@ -24,3 +24,11 @@ Correción del comportamiento del botón cuando haciamos click en el. El click n
 Lunes 29 de Abril
 
 Colocación botones en el menú principal. Falta jugar con el espacio restante para que los botones ocupen el ancho del titulo.
+
+Miércoles 1 de Mayo
+
+Colocación de los marcianos y la nave.
+
+Jueves 2 de Mayo
+
+Movimiento de la nave (mejorarlo), disparo de la nave y choque de la bala de la nave con los marcianos.
