@@ -19,6 +19,8 @@ namespace ProtectTheWorld
         private double vMovimiento;
         private Rectangle contenedor;
         private int puntuacion;
+        private Random generador;
+        private int aleatorio;
 
         //constructor
         public Marciano(GraphicsDeviceManager graphics, SpriteBatch spriteBatch, Texture2D imagen, int x, int y,int ancho,int alto,
@@ -34,6 +36,7 @@ namespace ProtectTheWorld
             this.puntuacion = puntuacion;
             this.ancho = ancho;
             this.alto = alto;
+            generador = new Random();
             //inicializo el contenedor
             this.contenedor = new Rectangle(this.pos.X, this.pos.Y, ancho, alto);
         }
@@ -140,13 +143,11 @@ namespace ProtectTheWorld
         }
 
         //------------------------PROBABILIDAD DISPARO MARCIANO------------------------
-        public bool dispara(int probabilidad)
+        public bool dispara(int probabilidad,int aleatorio)
         {
             //probabilidad de disparo
             //numero aleatorio entre 1 y 100
-            Random r = new Random();
-            int numero = r.Next(0, 101);
-            if (numero <= probabilidad)
+            if (aleatorio <= probabilidad)
                 return true;
             return false;
         }

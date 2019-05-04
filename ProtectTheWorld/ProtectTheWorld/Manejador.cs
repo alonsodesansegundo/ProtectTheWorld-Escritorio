@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Windows.UI.ViewManagement;
@@ -39,8 +40,9 @@ namespace ProtectTheWorld
 
         //**********************JUEGO**********************
         private int filas, columnas, nivel, primeraX, primeraY, altoMarciano, anchoMarciano,
-            altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave,
+            altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave, probabilidadDisparoMarcianos,aleatorio,
             puntuacionGlobal,auxiliar,anchoProyectilMarciano,altoProyectilMarciano;
+        private Random generador;
         private double vMarciano, vBala;
         private Marciano[,] marcianos;
         private ArrayList misColumnas;
@@ -183,6 +185,8 @@ namespace ProtectTheWorld
             vMarciano = 1;
             marcianos = new Marciano[filas, columnas];
             balasMarcianos = new List<BalaMarciano>();
+            probabilidadDisparoMarcianos = 33;
+            generador = new Random();
             misColumnas = new ArrayList();
             imgMarciano1 = Content.Load<Texture2D>("mio1");
             imgMarciano2 = Content.Load<Texture2D>("mio2");
@@ -579,7 +583,10 @@ namespace ProtectTheWorld
                         //añado la columna a mi arraylist
                         misColumnas.Add(j);
                         //si se decide que el marciano dispare (porque sale x probabilidad)
-                        if (marcianos[i,j].dispara(50))
+                        //probabilidadDisparoMarcianos++;
+
+                        aleatorio = generador.Next(0, 101);
+                        if (marcianos[i,j].dispara(probabilidadDisparoMarcianos,aleatorio))
                         {
                             //genero una nueva bala marciano que añado a su array
                             balasMarcianos.Add(new BalaMarciano(graphics,spriteBatch,(int)marcianos[i,j].getContenedor().Center.X -
