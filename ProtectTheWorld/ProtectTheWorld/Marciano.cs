@@ -72,9 +72,6 @@ namespace ProtectTheWorld
                 this.pos.Y += this.alto;
                 //actualizo el contenedor
                 this.contenedor.Y = this.pos.Y;
-
-                //this.contenedor.top = this.pos.Y;
-                //this.contenedor.bottom = this.pos.Y + this.imagen.Height;
             }
         }
 
@@ -82,14 +79,7 @@ namespace ProtectTheWorld
         {
             if (this.contenedor.Y + this.imagen.Height > limiteY)
                 return true;
-
             return false;
-
-            //if (this.contenedor.bottom > limiteY)
-            //{
-            //    return true;
-            //}
-            //return false;
         }
 
         public void moverLateral(bool izq)
@@ -98,17 +88,12 @@ namespace ProtectTheWorld
             {
                 this.pos.X -= (int)vMovimiento;
                 //acutalizo la pos x del contenedor
-                //this.contenedor.left = this.pos.x;
-                //this.contenedor.right = this.pos.x + imagen.Width;
             }
             else
             {
                 this.pos.X += (int)vMovimiento;
                 //acutalizo la pos x del contenedor
-                //this.contenedor.left = this.pos.x;
-                //this.contenedor.right = this.pos.x + imagen.Width;
             }
-
             this.contenedor.X = this.pos.X;
         }
 
@@ -146,6 +131,7 @@ namespace ProtectTheWorld
         public bool dispara(int probabilidad,int aleatorio)
         {
             //probabilidad de disparo
+            //numero aleatorio entre 1 y 100
             //numero aleatorio entre 1 y 100
             if (aleatorio <= probabilidad)
                 return true;

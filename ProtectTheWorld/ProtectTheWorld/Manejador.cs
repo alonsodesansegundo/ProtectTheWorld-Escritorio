@@ -40,22 +40,27 @@ namespace ProtectTheWorld
 
         //**********************JUEGO**********************
         private int filas, columnas, nivel, primeraX, primeraY, altoMarciano, anchoMarciano,
-            altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave, probabilidadDisparoMarcianos,aleatorio,
-            puntuacionGlobal,auxiliar,anchoProyectilMarciano,altoProyectilMarciano;
+            altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave, probabilidadDisparoMarcianos, aleatorio,
+            puntuacionGlobal, auxiliar, anchoProyectilMarciano, altoProyectilMarciano, vBalaMarciano;
         private Random generador;
         private double vMarciano, vBala;
         private Marciano[,] marcianos;
         private ArrayList misColumnas;
-        List<BalaMarciano> balasMarcianos;
+        private List<BalaMarciano> balasMarcianos;
 
-        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala,imgBalaMarciano,explosion;
+        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala, imgBalaMarciano, explosion;
         private Nave miNave;
-        private bool voyIzquierda, voyAbajo;
+        private bool voyIzquierda, voyAbajo, estoyJugando, mueveNave, mejoraPuntuacion, pideSiglas, perdi;
+
+        //**********************OPCIONES**********************
+        private Boton btnVolverMenu;
+        private Texture2D imgBtnVolver;
         public Manejador()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
+
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -94,123 +99,20 @@ namespace ProtectTheWorld
             AltoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Height;
             AnchoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Width;
 
-            //**********************MENU**********************
-            //STRINGS
-            titulo = "Protect the World";
-            txtJugar = "Jugar";
-            txtOpciones = "Opciones";
-            txtAyuda = "Ayuda";
-            txtCreditos = "Creditos";
-            txtRecords = "Records";
+            //TODAS LAS STRINGS (TEXTOS)
+            CargarTextos();
 
-            fondoMenu = Content.Load<Texture2D>("fondomenu");
-            fuenteTitulo = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
-            fuenteBotones = Content.Load<SpriteFont>("Fuentes/FuenteBotones");
+            //TODAS LAS FUENTES
+            CargarFuentes();
 
-            //ARRAYLIST DE BOTONES
-            botonesMenu = new List<Boton>();    //aqui porque si lo pongo en el método instance da null reference exception
-                                                //punto x, punto y, alto y ancho
-            espacio = (int)fuenteTitulo.MeasureString(titulo).X -
-               (int)fuenteBotones.MeasureString(txtJugar).X -
-               (int)fuenteBotones.MeasureString(txtOpciones).X -
-                (int)fuenteBotones.MeasureString(txtAyuda).X -
-                 (int)fuenteBotones.MeasureString(txtRecords).X -
-                  (int)fuenteBotones.MeasureString(txtCreditos).X;
-            espacio = espacio / 4;
-            int ancho;
-            int alto = (int)fuenteBotones.MeasureString(txtJugar).Y;
-            //Boton jugar
-            btnJugar = new Boton(this.graphics, this.spriteBatch,
-                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2,
-                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
-                (int)fuenteBotones.MeasureString(txtJugar).X,
-                alto,
-                Color.Transparent);
-            botonesMenu.Add(btnJugar);
-            ancho = (int)fuenteBotones.MeasureString(txtJugar).X;
+            //TODAS LAS IMAGENES
+            CargarImagenes();
 
-            //Boton opciones
-            btnOpciones = new Boton(this.graphics, this.spriteBatch,
-                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
-               AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
-               (int)fuenteBotones.MeasureString(txtOpciones).X,
-               alto,
-               Color.Transparent);
-            botonesMenu.Add(btnOpciones);
-            ancho += (int)fuenteBotones.MeasureString(txtOpciones).X + espacio;
+            //Botones del menú
+            CrearBotonesMenu();
 
-            //Boton ayuda
-            btnAyuda = new Boton(this.graphics, this.spriteBatch,
-                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
-                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
-                (int)fuenteBotones.MeasureString(txtAyuda).X,
-                alto,
-                Color.Transparent);
-            botonesMenu.Add(btnAyuda);
-            ancho += (int)fuenteBotones.MeasureString(txtAyuda).X + espacio;
-
-            //Boton records
-            btnRecords = new Boton(this.graphics, this.spriteBatch,
-                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
-                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
-                (int)fuenteBotones.MeasureString(txtRecords).X,
-                alto,
-                Color.Transparent);
-            botonesMenu.Add(btnRecords);
-            ancho += (int)fuenteBotones.MeasureString(txtRecords).X + espacio;
-
-            //Boton creditos
-            btnCreditos = new Boton(this.graphics, this.spriteBatch,
-                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
-                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
-                (int)fuenteBotones.MeasureString(txtCreditos).X,
-                alto,
-                Color.Transparent);
-            botonesMenu.Add(btnCreditos);
-
-
-            //**********************JUEGO**********************
-            auxiliar = 0;
-            puntuacionGlobal = 0;
-            //marcianos
-            filas = 5;
-            columnas = 10;
-            nivel = 0;
-            primeraX = 0;
-            primeraY = 0;
-            anchoMarciano = AnchoPantalla / 40;
-            altoMarciano = AnchoPantalla / 40;
-            anchoProyectilMarciano = anchoMarciano / 2;
-            altoProyectilMarciano = altoMarciano / 2;
-            vMarciano = 1;
-            marcianos = new Marciano[filas, columnas];
-            balasMarcianos = new List<BalaMarciano>();
-            probabilidadDisparoMarcianos = 33;
-            generador = new Random();
-            misColumnas = new ArrayList();
-            imgMarciano1 = Content.Load<Texture2D>("mio1");
-            imgMarciano2 = Content.Load<Texture2D>("mio2");
-
-            //relleno el array bidimensional de marcianos
-            rellenaMarcianos();
-
-            voyAbajo = false;
-            voyIzquierda = false;
-
-            //nave
-            vNave = 10;
-            vBala = 6;
-            imgBala = Content.Load<Texture2D>("proyectilnave");
-            imgBalaMarciano= Content.Load<Texture2D>("bombamarciano");
-            imgNave = Content.Load<Texture2D>("nave1");
-            explosion =Content.Load<Texture2D>("explosion");
-            altoNave = AnchoPantalla / 20;
-            anchoNave = AnchoPantalla / 20;
-            altoProyectilNave = altoNave/2;
-            anchoProyectilNave = anchoNave / 4;
-            miNave = new Nave(graphics, spriteBatch, imgNave,
-                AnchoPantalla / 2 - anchoNave / 2, AltoPantalla - altoNave, anchoNave, altoNave,
-               anchoProyectilNave, altoProyectilNave, vBala, imgBala);
+            //Botones de opciones
+            CrearBotonesOpciones();
 
         }
 
@@ -285,7 +187,98 @@ namespace ProtectTheWorld
                     break;
             }
         }
+        //TODOS LOS TEXTOS
+        public void CargarTextos()
+        {
+            titulo = "Protect the World";
+            txtJugar = "Jugar";
+            txtOpciones = "Opciones";
+            txtAyuda = "Ayuda";
+            txtCreditos = "Creditos";
+            txtRecords = "Records";
+        }
+        //TODAS LAS FUENTES
+        public void CargarFuentes()
+        {
+            fuenteTitulo = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
+            fuenteBotones = Content.Load<SpriteFont>("Fuentes/FuenteBotones");
+        }
+        //TODAS LAS IMAGENES
+        public void CargarImagenes()
+        {
+            fondoMenu = Content.Load<Texture2D>("fondomenu");
+            imgMarciano1 = Content.Load<Texture2D>("mio1");
+            imgMarciano2 = Content.Load<Texture2D>("mio2");
+            imgBala = Content.Load<Texture2D>("proyectilnave");
+            imgBalaMarciano = Content.Load<Texture2D>("bombamarciano");
+            imgNave = Content.Load<Texture2D>("nave1");
+            explosion = Content.Load<Texture2D>("explosion");
+            imgBtnVolver = Content.Load<Texture2D>("back");
+        }
         //MENÚ PRINCIPAL
+        public void CrearBotonesMenu()
+        {
+            //ARRAYLIST DE BOTONES
+            botonesMenu = new List<Boton>();    //aqui porque si lo pongo en el método instance da null reference exception
+                                                //punto x, punto y, alto y ancho
+            espacio = (int)fuenteTitulo.MeasureString(titulo).X -
+               (int)fuenteBotones.MeasureString(txtJugar).X -
+               (int)fuenteBotones.MeasureString(txtOpciones).X -
+                (int)fuenteBotones.MeasureString(txtAyuda).X -
+                 (int)fuenteBotones.MeasureString(txtRecords).X -
+                  (int)fuenteBotones.MeasureString(txtCreditos).X;
+            espacio = espacio / 4;
+            int ancho;
+            int alto = (int)fuenteBotones.MeasureString(txtJugar).Y;
+            //Boton jugar
+            btnJugar = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2,
+                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+                (int)fuenteBotones.MeasureString(txtJugar).X,
+                alto,
+                Color.Transparent);
+            botonesMenu.Add(btnJugar);
+            ancho = (int)fuenteBotones.MeasureString(txtJugar).X;
+
+            //Boton opciones
+            btnOpciones = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
+               AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+               (int)fuenteBotones.MeasureString(txtOpciones).X,
+               alto,
+               Color.Transparent);
+            botonesMenu.Add(btnOpciones);
+            ancho += (int)fuenteBotones.MeasureString(txtOpciones).X + espacio;
+
+            //Boton ayuda
+            btnAyuda = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
+                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+                (int)fuenteBotones.MeasureString(txtAyuda).X,
+                alto,
+                Color.Transparent);
+            botonesMenu.Add(btnAyuda);
+            ancho += (int)fuenteBotones.MeasureString(txtAyuda).X + espacio;
+
+            //Boton records
+            btnRecords = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
+                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+                (int)fuenteBotones.MeasureString(txtRecords).X,
+                alto,
+                Color.Transparent);
+            botonesMenu.Add(btnRecords);
+            ancho += (int)fuenteBotones.MeasureString(txtRecords).X + espacio;
+
+            //Boton creditos
+            btnCreditos = new Boton(this.graphics, this.spriteBatch,
+                (AnchoPantalla - (int)fuenteTitulo.MeasureString(titulo).X) / 2 + ancho + espacio,
+                AltoPantalla / 6 + (int)fuenteTitulo.MeasureString(titulo).Y,
+                (int)fuenteBotones.MeasureString(txtCreditos).X,
+                alto,
+                Color.Transparent);
+            botonesMenu.Add(btnCreditos);
+        }
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ PRINCIPAL
         public void DibujaMenu()
         {
@@ -340,7 +333,11 @@ namespace ProtectTheWorld
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
                         if (LevantoIzq(btnJugar))
+                        {
                             estadoActualJuego = EstadoJuego.Gameplay;
+                            //**********************JUEGO**********************
+                            CargarJuego();
+                        }
                         //titulo = "FUNCIONA";
                         if (LevantoIzq(btnOpciones))
                             estadoActualJuego = EstadoJuego.Opciones;
@@ -361,62 +358,48 @@ namespace ProtectTheWorld
             }
         }
 
-        //JUEGO
-        //MÉTODO ENCARGADO DE DIBUJAR EL JUEGO
-        public void DibujaJuego()
-        {
-            //dibujo el fondo negro
-            GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
-            //dibujo la puntuacion
-            spriteBatch.DrawString(fuenteBotones,
-                puntuacionGlobal.ToString(), 
-                new Vector2(AnchoPantalla/2- fuenteBotones.MeasureString(puntuacionGlobal.ToString()).X / 2,
-                fuenteBotones.MeasureString(puntuacionGlobal.ToString()).Y),
-                Color.White);
-            //dibujo los marcianos
-            foreach (Marciano m in marcianos)
-            {
-                if (m != null)
-                    m.Dibujar();
-            }
-            //dibujo todas las balas marcianos
-            for (int i = 0; i < balasMarcianos.Count; i++)
-            {
-                balasMarcianos[i].Dibuja();
-            }
+        //*****************************************************************JUEGO*****************************************************************
 
-            //dibujo la nave
-            miNave.Dibujar();
-            spriteBatch.End();
-        }
-        //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
-        public void GestionaJuego()
+        //------------------------GESTION TECLADO JUEGO------------------------
+        public void gestionaTeclado()
         {
-            auxiliar++;
-            //BALAS MARCIANOS
-            if (auxiliar == 100)
-            {
-                auxiliar = 0;
-                disparanMarcianos();
-            }
-            actualizaBalasMarcianos();
             //TECLADO
-            gestionaTeclado();
+            teclado = Keyboard.GetState();
+            //CONFIGURACION FLECHAS
+            //SI PULSA FLECHA ABAJO
+            if (teclado.IsKeyDown(Keys.Down))
+                estoyJugando = false;
 
-            //MOVIMIENTO BALA NAVE
-            mueveBalaNave();
-            
-            //BANDERAS MOVIMIENTO MARCIANOS
-            actualizaBanderasMovimiento();
+            if (estoyJugando)
+                if (estoyJugando)
+                {
+                    //SI PULSA LA FLECHA DRCH
+                    if (teclado.IsKeyDown(Keys.Right))
+                        miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+                    //SI PULSA LA FLECHA IZQ
+                    if (teclado.IsKeyDown(Keys.Left))
+                        miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+                    //SI PULSA FLECHA ARRIBA
+                    if (teclado.IsKeyDown(Keys.Up))
+                        miNave.disparar();
+                }
 
-            //MOVIMIENTO MARCIANOS
-            mueveMarcianos();
+
+            //CONFIGURACION ALTERNATIVA
+            //SI PULSA W
+            if (teclado.IsKeyDown(Keys.S))
+                estadoActualJuego = EstadoJuego.Menu;
+            //SI PULSA LA D
+            if (teclado.IsKeyDown(Keys.D))
+                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+            //SI PULSA LA A
+            if (teclado.IsKeyDown(Keys.A))
+                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+            //SI PULSA FLECHA ARRIBA
+            if (teclado.IsKeyDown(Keys.W))
+                miNave.disparar();
         }
-
-        //Método que será llamado cuando no haya más marcianos en el arraybidimensional. 
-        //Incrementa el nivel y se encarga de rellenar de marcianos el array bidimensional dependiendo del nivel en el que estemos.
-        //También se encarga de aumentar la velocidad de los marcianos en el momento adecuado
+        //------------------------RELLENA EL ARRAY DE MARCIANOS------------------------
         public void rellenaMarcianos()
         {
             try
@@ -463,14 +446,14 @@ namespace ProtectTheWorld
             }
 
         }
-
+        //------------------------HAY MARCIANOS------------------------
         public bool hayMarcianos()
         {
             for (int i = 0; i < marcianos.GetLength(0); i++)
             {
                 for (int j = 0; j < marcianos.GetLength(1); j++)
                 {
-                    if (marcianos[i,j] != null)
+                    if (marcianos[i, j] != null)
                     {
                         return true;
                     }
@@ -479,40 +462,7 @@ namespace ProtectTheWorld
             //si no he encontrado ningun null
             return false;
         }
-
-        public void gestionaTeclado()
-        {
-            //TECLADO
-            teclado = Keyboard.GetState();
-            //CONFIGURACION FLECHAS
-            //SI PULSA FLECHA ABAJO
-            if (teclado.IsKeyDown(Keys.Down))
-                estadoActualJuego = EstadoJuego.Menu;
-            //SI PULSA LA FLECHA DRCH
-            if (teclado.IsKeyDown(Keys.Right) && (!teclado.IsKeyUp(Keys.Right)))
-                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
-            //SI PULSA LA FLECHA IZQ
-            if (teclado.IsKeyDown(Keys.Left) && (!teclado.IsKeyUp(Keys.Left)))
-                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
-            //SI PULSA FLECHA ARRIBA
-            if (teclado.IsKeyDown(Keys.Up))
-                miNave.disparar();
-
-            //CONFIGURACION ALTERNATIVA
-            //SI PULSA W
-            if (teclado.IsKeyDown(Keys.S))
-                estadoActualJuego = EstadoJuego.Menu;
-            //SI PULSA LA D
-            if (teclado.IsKeyDown(Keys.D) && (!teclado.IsKeyUp(Keys.D)))
-                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
-            //SI PULSA LA A
-            if (teclado.IsKeyDown(Keys.A) && (!teclado.IsKeyUp(Keys.A)))
-                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
-            //SI PULSA FLECHA ARRIBA
-            if (teclado.IsKeyDown(Keys.W))
-                miNave.disparar();
-        }
-
+        //------------------------MOVIMIENTO BALA NAVE------------------------
         public void mueveBalaNave()
         {
             //SI HAY BALA EN PANTALLA
@@ -566,7 +516,6 @@ namespace ProtectTheWorld
                 }
             }
         }
-
         //------------------------DISPARO MARCIANOS------------------------
         public void disparanMarcianos()
         {
@@ -578,7 +527,7 @@ namespace ProtectTheWorld
                 for (int j = 0; j < marcianos.GetLength(1); j++)
                 {
                     //si esa columna no está en mi arraylist de columnas y en la posicion actual hay un marciano
-                    if (misColumnas.IndexOf(j) == -1 && marcianos[i,j] != null)
+                    if (misColumnas.IndexOf(j) == -1 && marcianos[i, j] != null)
                     {
                         //añado la columna a mi arraylist
                         misColumnas.Add(j);
@@ -586,14 +535,14 @@ namespace ProtectTheWorld
                         //probabilidadDisparoMarcianos++;
 
                         aleatorio = generador.Next(0, 101);
-                        if (marcianos[i,j].dispara(probabilidadDisparoMarcianos,aleatorio))
+                        if (marcianos[i, j].dispara(probabilidadDisparoMarcianos, aleatorio))
                         {
                             //genero una nueva bala marciano que añado a su array
-                            balasMarcianos.Add(new BalaMarciano(graphics,spriteBatch,(int)marcianos[i,j].getContenedor().Center.X -
+                            balasMarcianos.Add(new BalaMarciano(graphics, spriteBatch, (int)marcianos[i, j].getContenedor().Center.X -
                                     anchoProyectilMarciano / 2,
-                                    (int)marcianos[i,j].getPos().Y + altoMarciano,
+                                    (int)marcianos[i, j].getPos().Y + altoMarciano,
                                     anchoProyectilMarciano,
-                                   altoProyectilMarciano, imgBalaMarciano, 5));
+                                   altoProyectilMarciano, imgBalaMarciano, vBalaMarciano));
                         }
                     }
                 }
@@ -601,7 +550,6 @@ namespace ProtectTheWorld
             //limpio el arraylist que uso de contenedor de las columnas
             misColumnas.Clear();
         }
-
         //------------------------MOVIMIENTO BALAS MARCIANOS------------------------
         public void actualizaBalasMarcianos()
         {
@@ -617,8 +565,8 @@ namespace ProtectTheWorld
 
                     miNave.setImagen(explosion);
                     //perdi
-                    //estoyJugando = false;
-                    //mueveNave = false;
+                    estoyJugando = false;
+                    mueveNave = false;
                     //acabaMusica();
                     //if (mejoraPuntuacion())
                     //{
@@ -628,6 +576,7 @@ namespace ProtectTheWorld
                     //{
                     //    perdi = true;
                     //}
+                    perdi = true;
                 }
                 else
                 {
@@ -658,7 +607,6 @@ namespace ProtectTheWorld
                 }
             }
         }
-
         //------------------------MOVIMIENTO VERTICAL Y HORIZONTAL DE LOS MARCIANOS------------------------
         public void actualizaBanderasMovimiento()
         {
@@ -671,10 +619,10 @@ namespace ProtectTheWorld
                 for (int j = 0; j < marcianos.GetLength(1); j++)
                 {
                     //si hay un marciano
-                    if (marcianos[i,j] != null)
+                    if (marcianos[i, j] != null)
                     {
                         //si un marciano llega al limite de la derecha
-                        if (marcianos[i,j].limiteDerecha(AnchoPantalla))
+                        if (marcianos[i, j].limiteDerecha(AnchoPantalla))
                         {
                             //bandera voy abajo a true
                             voyAbajo = true;
@@ -686,7 +634,7 @@ namespace ProtectTheWorld
                         else
                         {
                             //si no llegue al limite por la derecha, miro si llegue al limite por la izquierda
-                            if (marcianos[i,j].limiteIzquierda())
+                            if (marcianos[i, j].limiteIzquierda())
                             {
                                 //bandera voy abajo a true
                                 voyAbajo = true;
@@ -700,7 +648,6 @@ namespace ProtectTheWorld
                 }
             }
         }
-        
         public void mueveMarcianos()
         {
             //recorro las filas
@@ -710,13 +657,13 @@ namespace ProtectTheWorld
                 for (int j = 0; j < marcianos.GetLength(1); j++)
                 {
                     //si hay un marciano
-                    if (marcianos[i,j] != null)
+                    if (marcianos[i, j] != null)
                     {
                         //lo muevo de manera lateral segun en que dirección tengo que ir
-                        marcianos[i,j].moverLateral(voyIzquierda);
+                        marcianos[i, j].moverLateral(voyIzquierda);
                         //en caso de tener que descender un nivel, lo hace
-                        marcianos[i,j].moverAbajo(voyAbajo);
-                        if (marcianos[i,j].limiteAbajo(AltoPantalla - miNave.getAlto()))
+                        marcianos[i, j].moverAbajo(voyAbajo);
+                        if (marcianos[i, j].limiteAbajo(AltoPantalla - miNave.getAlto()))
                         {
                             //if (mejoraPuntuacion())
                             //{
@@ -735,18 +682,150 @@ namespace ProtectTheWorld
             //pongo la bandera voyAbajo a false
             voyAbajo = false;
         }
+        //------------------------INICIALIZA LAS VARIABLES DEL JUEGO------------------------
+        public void CargarJuego()
+        {
+            //booleanas de control
+            estoyJugando = true;
+            auxiliar = 0;
+            puntuacionGlobal = 0;
+            //marcianos
+            filas = 5;
+            columnas = 10;
+            nivel = 0;
+            primeraX = 0;
+            primeraY = 0;
+            anchoMarciano = AnchoPantalla / 40;
+            altoMarciano = AnchoPantalla / 40;
+            anchoProyectilMarciano = anchoMarciano / 2;
+            altoProyectilMarciano = altoMarciano / 2;
+            vBalaMarciano = 3;
+            vMarciano = 1;
+            marcianos = new Marciano[filas, columnas];
+            balasMarcianos = new List<BalaMarciano>();
+            probabilidadDisparoMarcianos = 33;
+            generador = new Random();
+            misColumnas = new ArrayList();
 
+            //relleno el array bidimensional de marcianos
+            rellenaMarcianos();
+
+            voyAbajo = false;
+            voyIzquierda = false;
+
+            //nave
+            vNave = 10;
+            vBala = 6;
+            altoNave = AnchoPantalla / 20;
+            anchoNave = AnchoPantalla / 20;
+            altoProyectilNave = altoNave / 2;
+            anchoProyectilNave = anchoNave / 4;
+            miNave = new Nave(graphics, spriteBatch, imgNave,
+                AnchoPantalla / 2 - anchoNave / 2, AltoPantalla - altoNave, anchoNave, altoNave,
+               anchoProyectilNave, altoProyectilNave, vBala, imgBala);
+        }
+        //MÉTODO ENCARGADO DE DIBUJAR EL JUEGO
+        public void DibujaJuego()
+        {
+            //dibujo el fondo negro
+            GraphicsDevice.Clear(Color.Black);
+            spriteBatch.Begin();
+            //dibujo la puntuacion
+            spriteBatch.DrawString(fuenteBotones,
+                puntuacionGlobal.ToString(),
+                new Vector2(AnchoPantalla / 2 - fuenteBotones.MeasureString(puntuacionGlobal.ToString()).X / 2,
+                fuenteBotones.MeasureString(puntuacionGlobal.ToString()).Y),
+                Color.White);
+            //dibujo los marcianos
+            foreach (Marciano m in marcianos)
+            {
+                if (m != null)
+                    m.Dibujar();
+            }
+            //dibujo todas las balas marcianos
+            for (int i = 0; i < balasMarcianos.Count; i++)
+            {
+                balasMarcianos[i].Dibuja();
+            }
+
+            //dibujo la nave
+            miNave.Dibujar();
+            spriteBatch.End();
+        }
+        //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
+        public void GestionaJuego()
+        {
+
+            if (estoyJugando)
+            {
+                auxiliar++;
+                //BALAS MARCIANOS
+                if (auxiliar == 100)
+                {
+                    auxiliar = 0;
+                    disparanMarcianos();
+                }
+                //MOVIMIENTO BALAS MARCIANOS
+                actualizaBalasMarcianos();
+
+                //BANDERAS MOVIMIENTO MARCIANOS
+                actualizaBanderasMovimiento();
+
+                //MOVIMIENTO MARCIANOS
+                mueveMarcianos();
+
+                //MOVIMIENTO BALA NAVE
+                mueveBalaNave();
+            }
+            //TECLADO
+            gestionaTeclado();
+
+
+        }
+
+
+        //*****************************************************************OPCIONES*****************************************************************
+        public void CrearBotonesOpciones()
+        {
+            int ancho = AnchoPantalla / 25;
+            btnVolverMenu = new Boton(graphics, spriteBatch, AnchoPantalla - ancho, 0, ancho, ancho, Color.Transparent);
+            btnVolverMenu.SetImagen(imgBtnVolver);
+        }
         public void DibujaOpciones()
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            spriteBatch.DrawString(fuenteTitulo, "OPCIONES", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.DrawString(fuenteTitulo, txtOpciones, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
+            btnVolverMenu.Dibuja();
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ OPCIONES
         public void GestionaOpciones()
         {
+            //si cambia el estado del click izq
+            if (estadoClickIzq != Mouse.GetState().LeftButton)
+            {
+                //cambio mi variable
+                estadoClickIzq = Mouse.GetState().LeftButton;
+                //dependiendo del estado actual del click izquierdo, hago una cosa u otra
+                switch (estadoClickIzq)
+                {
+                    //si el boton izq está pulsado
+                    case ButtonState.Pressed:
+                        //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
+                        if (ClickIzq(btnVolverMenu))
+                            btnVolverMenu.SetBandera(true);
+                        break;
+                    //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
+                    case ButtonState.Released:
+                        if (LevantoIzq(btnVolverMenu))
+                            estadoActualJuego = EstadoJuego.Menu;
 
+                        //pongo a false las banderas de todos los botones del menu opciones
+                        btnVolverMenu.SetBandera(false);
+                        break;
+                }
+            }
         }
 
         //AYUDA

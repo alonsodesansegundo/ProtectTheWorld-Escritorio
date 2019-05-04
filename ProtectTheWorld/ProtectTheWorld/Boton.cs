@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProtectTheWorld
 {
-   public class Boton
+    public class Boton
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -16,7 +16,7 @@ namespace ProtectTheWorld
         private bool bandera;
         private Color[] data;
         private Vector2 punto;
-        private int x,y,ancho, alto;
+        private int x, y, ancho, alto;
         //Rectangulo contenedor
         private Rectangle contenedor;
         //Para el texto del boton
@@ -26,7 +26,6 @@ namespace ProtectTheWorld
         //Imagen boton
         private Texture2D imagen;
         public Boton(GraphicsDeviceManager graphics, SpriteBatch spriteBatch, int x, int y, int ancho, int alto, Color color)
-      
         {
             //propiedades boton
             this.graphics = graphics;
@@ -36,37 +35,23 @@ namespace ProtectTheWorld
             this.ancho = ancho;
             this.alto = alto;
             this.bandera = false;
-            contenedor = new Rectangle(x, y, ancho, alto);
-            rectangulo = new Texture2D(graphics.GraphicsDevice, ancho, alto);
+            this.contenedor = new Rectangle(x, y, ancho, alto);
+            this.rectangulo = new Texture2D(graphics.GraphicsDevice, ancho, alto);
             data = new Color[ancho * alto];
             for (int i = 0; i < data.Length; ++i) data[i] = color;
             rectangulo.SetData(data);
-            punto = new Vector2(x, y);
+            this.punto = new Vector2(x, y);
         }
-        public bool GetBandera()
-        {
-            return this.bandera;
-        }
-        public void SetBandera(bool booleana)
-        {
-            this.bandera = booleana;
-        }
-        public Rectangle GetContenedor()
-        {
-            return this.contenedor;
-        }
+        public bool GetBandera() { return this.bandera; }
+        public void SetBandera(bool booleana) { this.bandera = booleana; }
+        public Rectangle GetContenedor() { return this.contenedor; }
         public void Dibuja()
         {
             spriteBatch.Draw(rectangulo, punto, Color.White);
             if (texto != null)
-            {
                 spriteBatch.DrawString(fuente, texto, punto, colorTexto);
-            }
             if (imagen != null)
-            {
-                spriteBatch.Draw(imagen, new Rectangle(x, y,
-               ancho, alto), Color.White);
-            }
+                spriteBatch.Draw(this.imagen, this.contenedor, Color.White);
         }
         //Método que se utilizará para introducir texto dentro del boton
         public void SetTexto(string texto, SpriteFont fuente, Color color)
