@@ -39,6 +39,7 @@ namespace ProtectTheWorld
         private Boton btnJugar, btnOpciones, btnAyuda, btnRecords, btnCreditos;
 
         //**********************JUEGO**********************
+        private string modo, preguntaPausa, txtReanudar, txtSalir;
         private int filas, columnas, nivel, primeraX, primeraY, altoMarciano, anchoMarciano,
             altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave, probabilidadDisparoMarcianos, aleatorio,
             puntuacionGlobal, auxiliar, anchoProyectilMarciano, altoProyectilMarciano, vBalaMarciano;
@@ -47,8 +48,8 @@ namespace ProtectTheWorld
         private Marciano[,] marcianos;
         private ArrayList misColumnas;
         private List<BalaMarciano> balasMarcianos;
-
-        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala, imgBalaMarciano, explosion;
+        private Boton btnPausa, btnReanudar, btnSalir, btnMusica;
+        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala, imgBalaMarciano, explosion, imgBtnPausa, imgBtnPlay;
         private Nave miNave;
         private bool voyIzquierda, voyAbajo, estoyJugando, mueveNave, mejoraPuntuacion, pideSiglas, perdi;
 
@@ -110,6 +111,9 @@ namespace ProtectTheWorld
 
             //Botones del menú
             CrearBotonesMenu();
+
+            //Botones del juego
+            CrearBotonesJuego();
 
             //Botones de opciones
             CrearBotonesOpciones();
@@ -196,6 +200,9 @@ namespace ProtectTheWorld
             txtAyuda = "Ayuda";
             txtCreditos = "Creditos";
             txtRecords = "Records";
+            preguntaPausa = "Que deseas hacer?";
+            txtReanudar = "Reanudar";
+            txtSalir = "Salir";
         }
         //TODAS LAS FUENTES
         public void CargarFuentes()
@@ -214,6 +221,8 @@ namespace ProtectTheWorld
             imgNave = Content.Load<Texture2D>("nave1");
             explosion = Content.Load<Texture2D>("explosion");
             imgBtnVolver = Content.Load<Texture2D>("back");
+            imgBtnPausa = Content.Load<Texture2D>("pause");
+            imgBtnPlay = Content.Load<Texture2D>("play");
         }
         //MENÚ PRINCIPAL
         public void CrearBotonesMenu()
@@ -367,8 +376,8 @@ namespace ProtectTheWorld
             teclado = Keyboard.GetState();
             //CONFIGURACION FLECHAS
             //SI PULSA FLECHA ABAJO
-            if (teclado.IsKeyDown(Keys.Down))
-                estoyJugando = false;
+            //if (teclado.IsKeyDown(Keys.Down))
+            //    estoyJugando = false;
 
             if (estoyJugando)
                 if (estoyJugando)
@@ -379,25 +388,25 @@ namespace ProtectTheWorld
                     //SI PULSA LA FLECHA IZQ
                     if (teclado.IsKeyDown(Keys.Left))
                         miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
-                    //SI PULSA FLECHA ARRIBA
-                    if (teclado.IsKeyDown(Keys.Up))
+                    //SI PULSA EL ESPACIO
+                    if (teclado.IsKeyDown(Keys.Space))
                         miNave.disparar();
                 }
 
 
             //CONFIGURACION ALTERNATIVA
             //SI PULSA W
-            if (teclado.IsKeyDown(Keys.S))
-                estadoActualJuego = EstadoJuego.Menu;
-            //SI PULSA LA D
-            if (teclado.IsKeyDown(Keys.D))
-                miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
-            //SI PULSA LA A
-            if (teclado.IsKeyDown(Keys.A))
-                miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
-            //SI PULSA FLECHA ARRIBA
-            if (teclado.IsKeyDown(Keys.W))
-                miNave.disparar();
+            //if (teclado.IsKeyDown(Keys.S))
+            //    estadoActualJuego = EstadoJuego.Menu;
+            ////SI PULSA LA D
+            //if (teclado.IsKeyDown(Keys.D))
+            //    miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+            ////SI PULSA LA A
+            //if (teclado.IsKeyDown(Keys.A))
+            //    miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+            ////SI PULSA FLECHA ARRIBA
+            //if (teclado.IsKeyDown(Keys.W))
+            //    miNave.disparar();
         }
         //------------------------RELLENA EL ARRAY DE MARCIANOS------------------------
         public void rellenaMarcianos()
@@ -445,6 +454,31 @@ namespace ProtectTheWorld
 
             }
 
+        }
+        //------------------------BOTONES JUEGO------------------------
+        public void CrearBotonesJuego()
+        {
+            int ancho = AnchoPantalla / 25;
+            btnPausa = new Boton(graphics, spriteBatch, AnchoPantalla - ancho, 0, ancho, ancho, Color.Transparent);
+            btnPausa.SetImagen(imgBtnPausa);
+
+            //int espacio = AnchoPantalla / 20;
+            //(int)fuenteTitulo.MeasureString(titulo).X)
+            btnReanudar = new Boton(graphics, spriteBatch,
+                AnchoPantalla / 2 - (int)fuenteBotones.MeasureString(txtReanudar).X /*- espacio*/,
+                AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtReanudar).Y ,
+                (int)fuenteBotones.MeasureString(txtReanudar).X,
+                (int)fuenteBotones.MeasureString(txtReanudar).Y,
+                Color.Green);
+            btnReanudar.SetTexto(txtReanudar, fuenteBotones, Color.Black);
+
+            btnSalir = new Boton(graphics, spriteBatch,
+                AnchoPantalla / 2 + espacio,
+                AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtSalir).Y ,
+                (int)fuenteBotones.MeasureString(txtSalir).X,
+                (int)fuenteBotones.MeasureString(txtSalir).Y,
+                Color.Red);
+            btnSalir.SetTexto(txtSalir, fuenteBotones, Color.Black);
         }
         //------------------------HAY MARCIANOS------------------------
         public bool hayMarcianos()
@@ -685,6 +719,8 @@ namespace ProtectTheWorld
         //------------------------INICIALIZA LAS VARIABLES DEL JUEGO------------------------
         public void CargarJuego()
         {
+            //control
+            modo = "jugando";
             //booleanas de control
             estoyJugando = true;
             auxiliar = 0;
@@ -730,6 +766,39 @@ namespace ProtectTheWorld
             //dibujo el fondo negro
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
+
+            //dibujo la puntuacion, marcianos, nave, balas marcianos, bala nave
+            DibujaGameplay();
+            switch (modo)
+            {
+                case "pausa":
+                    DibujaPausa();
+                    break;
+            }
+            //dibujo los botones
+            btnPausa.Dibuja();
+            spriteBatch.End();
+        }
+        public void DibujaPausa()
+        {
+            //dibujo el rectangulo
+            Texture2D rectangulo = new Texture2D(graphics.GraphicsDevice, AnchoPantalla/3, AltoPantalla/3);
+           Color[] data = new Color[AnchoPantalla/3 * AltoPantalla/3];
+            for (int i = 0; i < data.Length; ++i) data[i] = Color.LightGray;
+            rectangulo.SetData(data);
+            Vector2 punto = new Vector2(AnchoPantalla/2-AnchoPantalla/6,AltoPantalla/2-AltoPantalla/6);
+            spriteBatch.Draw(rectangulo, punto, Color.White);
+
+            //dibujo la pregunta
+            spriteBatch.DrawString(fuenteBotones, preguntaPausa, new Vector2(AnchoPantalla/2-(int)fuenteBotones.MeasureString(preguntaPausa).X/2,punto.Y), Color.Black);
+
+            //dibujo los botones
+            btnReanudar.Dibuja();
+            btnSalir.Dibuja();
+
+        }
+        public void DibujaGameplay()
+        {
             //dibujo la puntuacion
             spriteBatch.DrawString(fuenteBotones,
                 puntuacionGlobal.ToString(),
@@ -750,39 +819,161 @@ namespace ProtectTheWorld
 
             //dibujo la nave
             miNave.Dibujar();
-            spriteBatch.End();
         }
+
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
         public void GestionaJuego()
         {
-
-            if (estoyJugando)
+            switch (modo)
             {
-                auxiliar++;
-                //BALAS MARCIANOS
-                if (auxiliar == 100)
-                {
-                    auxiliar = 0;
-                    disparanMarcianos();
-                }
-                //MOVIMIENTO BALAS MARCIANOS
-                actualizaBalasMarcianos();
+                case "jugando":
+                    auxiliar++;
+                    //BALAS MARCIANOS
+                    if (auxiliar == 100)
+                    {
+                        auxiliar = 0;
+                        disparanMarcianos();
+                    }
+                    //MOVIMIENTO BALAS MARCIANOS
+                    actualizaBalasMarcianos();
 
-                //BANDERAS MOVIMIENTO MARCIANOS
-                actualizaBanderasMovimiento();
+                    //BANDERAS MOVIMIENTO MARCIANOS
+                    actualizaBanderasMovimiento();
 
-                //MOVIMIENTO MARCIANOS
-                mueveMarcianos();
+                    //MOVIMIENTO MARCIANOS
+                    mueveMarcianos();
 
-                //MOVIMIENTO BALA NAVE
-                mueveBalaNave();
+                    //MOVIMIENTO BALA NAVE
+                    mueveBalaNave();
+                    //GESTION PULSACION BOTON PAUSA
+                    GestionaMenuPausa();
+                    break;
+                case "pausa":
+                    GestionaMenuPausa();
+                    break;
+                case "hacerInsert":
+                    break;
             }
             //TECLADO
             gestionaTeclado();
-
-
         }
+        //------------------------PULSA PAUSA------------------------
+        public void GestionaMenuPausa()
+        {
+            //si cambia el estado del click izq
+            if (estadoClickIzq != Mouse.GetState().LeftButton)
+            {
+                //cambio mi variable
+                estadoClickIzq = Mouse.GetState().LeftButton;
+                //dependiendo del estado actual del click izquierdo, hago una cosa u otra
+                switch (estadoClickIzq)
+                {
+                    //si el boton izq está pulsado
+                    case ButtonState.Pressed:
+                        //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
+                        if (ClickIzq(btnPausa))
+                            btnPausa.SetBandera(true);
 
+                        if (ClickIzq(btnReanudar))
+                            btnReanudar.SetBandera(true);
+                        if (ClickIzq(btnSalir))
+                            btnSalir.SetBandera(true);
+                        break;
+                    //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
+                    case ButtonState.Released:
+                        if (LevantoIzq(btnPausa))
+                        {
+                            switch (modo)
+                            {
+                                case "jugando":
+                                    modo = "pausa";
+                                    btnPausa.SetImagen(imgBtnPlay);
+                                    break;
+                                case "pausa":
+                                    btnPausa.SetImagen(imgBtnPausa);
+                                    modo = "jugando";
+                                    break;
+                            }
+                        }
+                        if (LevantoIzq(btnReanudar))
+                        {
+                            btnPausa.SetImagen(imgBtnPausa);
+                            modo = "jugando";
+                        }
+
+                        if (LevantoIzq(btnSalir))
+                            estadoActualJuego = EstadoJuego.Menu;
+
+                        //pongo a false las banderas de todos los botones del menu opciones
+                        btnPausa.SetBandera(false);
+                        btnReanudar.SetBandera(false);
+                        btnSalir.SetBandera(false);
+                        break;
+                }
+            }
+        }
+        public void PulsaReanudar()
+        {
+            //si cambia el estado del click izq
+            if (estadoClickIzq != Mouse.GetState().LeftButton)
+            {
+                //cambio mi variable
+                estadoClickIzq = Mouse.GetState().LeftButton;
+                //dependiendo del estado actual del click izquierdo, hago una cosa u otra
+                switch (estadoClickIzq)
+                {
+                    //si el boton izq está pulsado
+                    case ButtonState.Pressed:
+                        //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
+                        if (ClickIzq(btnReanudar))
+                            btnReanudar.SetBandera(true);
+                        break;
+                    //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
+                    case ButtonState.Released:
+                        if (LevantoIzq(btnReanudar))
+                            modo = "jugando";
+
+                        //pongo a false las banderas de todos los botones del menu opciones
+                        btnReanudar.SetBandera(false);
+                        break;
+                }
+            }
+        }
+        public void PulsaSalir()
+        {
+
+            //si cambia el estado del click izq
+            if (estadoClickIzq != Mouse.GetState().LeftButton)
+            {
+                //cambio mi variable
+                estadoClickIzq = Mouse.GetState().LeftButton;
+                //dependiendo del estado actual del click izquierdo, hago una cosa u otra
+                switch (estadoClickIzq)
+                {
+                    //si el boton izq está pulsado
+                    case ButtonState.Pressed:
+                        //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
+                        if (ClickIzq(btnSalir))
+                            btnSalir.SetBandera(true);
+                        break;
+                    //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
+                    case ButtonState.Released:
+                        if (LevantoIzq(btnSalir))
+                            estadoActualJuego = EstadoJuego.Menu;
+
+                        //pongo a false las banderas de todos los botones del menu opciones
+                        btnSalir.SetBandera(false);
+                        break;
+                }
+            }
+        }
+        public void gestionaMenuPausa()
+        {
+            GestionaMenuPausa();
+
+            PulsaReanudar();
+            PulsaSalir();
+        }
 
         //*****************************************************************OPCIONES*****************************************************************
         public void CrearBotonesOpciones()
