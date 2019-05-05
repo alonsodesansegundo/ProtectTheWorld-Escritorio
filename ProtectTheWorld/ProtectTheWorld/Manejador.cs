@@ -117,6 +117,9 @@ namespace ProtectTheWorld
 
             //Botones de opciones
             CrearBotonesOpciones();
+            int ancho = AnchoPantalla / 25;
+            btnVolverMenu = new Boton(graphics, spriteBatch, AnchoPantalla - ancho, 0, ancho, ancho, Color.Transparent);
+            btnVolverMenu.SetImagen(imgBtnVolver);
 
         }
 
@@ -150,12 +153,16 @@ namespace ProtectTheWorld
                     break;
                 case EstadoJuego.Creditos:
                     GestionaCreditos();
+                    GestionaCreditos();
                     break;
                 case EstadoJuego.Records:
                     GestionaRecords();
                     break;
                 case EstadoJuego.Opciones:
                     GestionaOpciones();
+                    break;
+                case EstadoJuego.Ayuda:
+                    GestionaAyuda();
                     break;
             }
         }
@@ -183,8 +190,11 @@ namespace ProtectTheWorld
                 case EstadoJuego.Creditos:
                     DibujaCreditos();
                     break;
+                case EstadoJuego.Ayuda:
+                    DibujaAyuda();
+                    break;
                 case EstadoJuego.Records:
-                    DibujaCreditos();
+                    DibujaRecords();
                     break;
                 case EstadoJuego.Opciones:
                     DibujaOpciones();
@@ -978,9 +988,7 @@ namespace ProtectTheWorld
         //*****************************************************************OPCIONES*****************************************************************
         public void CrearBotonesOpciones()
         {
-            int ancho = AnchoPantalla / 25;
-            btnVolverMenu = new Boton(graphics, spriteBatch, AnchoPantalla - ancho, 0, ancho, ancho, Color.Transparent);
-            btnVolverMenu.SetImagen(imgBtnVolver);
+            
         }
         public void DibujaOpciones()
         {
@@ -1023,44 +1031,118 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ AYUDA
         public void DibujaAyuda()
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            spriteBatch.DrawString(fuenteTitulo, "AYUDA", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.DrawString(fuenteTitulo, txtAyuda, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
+            btnVolverMenu.Dibuja();
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ OPCIONES
         public void GestionaAyuda()
         {
+            //si cambia el estado del click izq
+            if (estadoClickIzq != Mouse.GetState().LeftButton)
+            {
+                //cambio mi variable
+                estadoClickIzq = Mouse.GetState().LeftButton;
+                //dependiendo del estado actual del click izquierdo, hago una cosa u otra
+                switch (estadoClickIzq)
+                {
+                    //si el boton izq está pulsado
+                    case ButtonState.Pressed:
+                        //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
+                        if (ClickIzq(btnVolverMenu))
+                            btnVolverMenu.SetBandera(true);
+                        break;
+                    //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
+                    case ButtonState.Released:
+                        if (LevantoIzq(btnVolverMenu))
+                            estadoActualJuego = EstadoJuego.Menu;
 
+                        //pongo a false las banderas de todos los botones del menu opciones
+                        btnVolverMenu.SetBandera(false);
+                        break;
+                }
+            }
         }
 
         //RÉCORDS        
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ RÉCORDS
         public void DibujaRecords()
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            spriteBatch.DrawString(fuenteTitulo, "RECORDS", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.DrawString(fuenteTitulo, txtRecords, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
+            btnVolverMenu.Dibuja();
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ RÉCORDS
         public void GestionaRecords()
         {
+            //si cambia el estado del click izq
+            if (estadoClickIzq != Mouse.GetState().LeftButton)
+            {
+                //cambio mi variable
+                estadoClickIzq = Mouse.GetState().LeftButton;
+                //dependiendo del estado actual del click izquierdo, hago una cosa u otra
+                switch (estadoClickIzq)
+                {
+                    //si el boton izq está pulsado
+                    case ButtonState.Pressed:
+                        //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
+                        if (ClickIzq(btnVolverMenu))
+                            btnVolverMenu.SetBandera(true);
+                        break;
+                    //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
+                    case ButtonState.Released:
+                        if (LevantoIzq(btnVolverMenu))
+                            estadoActualJuego = EstadoJuego.Menu;
 
+                        //pongo a false las banderas de todos los botones del menu opciones
+                        btnVolverMenu.SetBandera(false);
+                        break;
+                }
+            }
+
+           
         }
         //CRÉDITOS
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ CRÉDITOS
         public void DibujaCreditos()
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            spriteBatch.DrawString(fuenteTitulo, "CREDITOS", new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
+            spriteBatch.DrawString(fuenteTitulo, txtCreditos, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
+            btnVolverMenu.Dibuja();
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ CRÉDITOS
         public void GestionaCreditos()
         {
+            //si cambia el estado del click izq
+            if (estadoClickIzq != Mouse.GetState().LeftButton)
+            {
+                //cambio mi variable
+                estadoClickIzq = Mouse.GetState().LeftButton;
+                //dependiendo del estado actual del click izquierdo, hago una cosa u otra
+                switch (estadoClickIzq)
+                {
+                    //si el boton izq está pulsado
+                    case ButtonState.Pressed:
+                        //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
+                        if (ClickIzq(btnVolverMenu))
+                            btnVolverMenu.SetBandera(true);
+                        break;
+                    //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
+                    case ButtonState.Released:
+                        if (LevantoIzq(btnVolverMenu))
+                            estadoActualJuego = EstadoJuego.Menu;
 
+                        //pongo a false las banderas de todos los botones del menu opciones
+                        btnVolverMenu.SetBandera(false);
+                        break;
+                }
+            }
         }
 
         //PULSA
