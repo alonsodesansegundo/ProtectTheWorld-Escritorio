@@ -33,7 +33,7 @@ namespace ProtectTheWorld
         private EstadoJuego estadoActualJuego;
         private ButtonState estadoClickIzq;
         private int AnchoPantalla, AltoPantalla;
-        private SpriteFont fuenteTitulo, fuenteBotones;
+        private SpriteFont fuenteTitulo, fuenteBotones, fuenteSub;
         private string titulo, txtJugar, txtOpciones, txtAyuda, txtRecords, txtCreditos;
         private List<Boton> botonesMenu;
         private Texture2D fondoMenu;
@@ -50,16 +50,22 @@ namespace ProtectTheWorld
         private ArrayList misColumnas;
         private List<BalaMarciano> balasMarcianos;
         private Boton btnPausa, btnReanudar, btnSalir, btnMusica;
-        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala, imgBalaMarciano, explosion, imgBtnPausa, imgBtnPlay,imgMusicaOn,imgMusicaOff;
+        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala, imgBalaMarciano, explosion, imgBtnPausa, imgBtnPlay, imgMusicaOn, imgMusicaOff;
         private Nave miNave;
         private bool voyIzquierda, voyAbajo, estoyJugando, mueveNave, mejoraPuntuacion, pideSiglas, perdi;
+
+        //menu pausa
+        private int altoMenuPausa, anchoMenuPausa, espacioMenuPausa;
+        private Texture2D rectanguloPausa;
+        private Color[] dataPausa;
+        private Vector2 puntoPausa;
 
         //**********************OPCIONES**********************
         private Boton btnVolverMenu;
         private Texture2D imgBtnVolver;
 
         //**********************AYUDA**********************
-        private string txtFindalidad, txtNave, txtNiveles, txtMarcianos, tFin, tNave, tNiveles, tMarcianos,impacto1,impacto2,txtP,txtP2;
+        private string txtFindalidad, txtNave, txtNiveles, txtMarcianos, tFin, tNave, tNiveles, tMarcianos, impacto1, impacto2, txtP, txtP2;
         //**********************CONSTRUCTOR**********************
         public Manejador()
         {
@@ -240,6 +246,7 @@ namespace ProtectTheWorld
         {
             fuenteTitulo = Content.Load<SpriteFont>("Fuentes/FuenteTitulo");
             fuenteBotones = Content.Load<SpriteFont>("Fuentes/FuenteBotones");
+            fuenteSub = Content.Load<SpriteFont>("Fuentes/FuenteSub");
         }
         //TODAS LAS IMAGENES
         public void CargarImagenes()
@@ -331,11 +338,11 @@ namespace ProtectTheWorld
             //dibujo el titulo del juego
             spriteBatch.DrawString(fuenteTitulo, titulo, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
             // set texto set imagen
-            btnJugar.SetTexto(txtJugar, fuenteBotones, Color.White,false);
-            btnOpciones.SetTexto(txtOpciones, fuenteBotones, Color.White,false);
-            btnAyuda.SetTexto(txtAyuda, fuenteBotones, Color.White,false);
-            btnRecords.SetTexto(txtRecords, fuenteBotones, Color.White,false);
-            btnCreditos.SetTexto(txtCreditos, fuenteBotones, Color.White,false);
+            btnJugar.SetTexto(txtJugar, fuenteBotones, Color.White, false);
+            btnOpciones.SetTexto(txtOpciones, fuenteBotones, Color.White, false);
+            btnAyuda.SetTexto(txtAyuda, fuenteBotones, Color.White, false);
+            btnRecords.SetTexto(txtRecords, fuenteBotones, Color.White, false);
+            btnCreditos.SetTexto(txtCreditos, fuenteBotones, Color.White, false);
             //jugar.SetImagen(fondoMenu);
             //BOTONES
             foreach (Boton b in botonesMenu)
@@ -498,23 +505,28 @@ namespace ProtectTheWorld
             btnMusica = new Boton(graphics, spriteBatch, AnchoPantalla - ancho * 2, 0, ancho, ancho, Color.Transparent);
             btnMusica.SetImagen(imgMusicaOn);
 
-            //int espacio = AnchoPantalla / 20;
-            //(int)fuenteTitulo.MeasureString(titulo).X)
+           
+            espacioMenuPausa = 20;
+            altoMenuPausa = AltoPantalla / 4;
+            Vector2 punto = new Vector2(AnchoPantalla / 2 - (int)fuenteSub.MeasureString(preguntaPausa).X / 2 - espacioMenuPausa
+               , AltoPantalla / 2 - AltoPantalla / 6);
+
+            anchoMenuPausa = (int)fuenteSub.MeasureString(preguntaPausa).X + espacioMenuPausa * 2;
             btnReanudar = new Boton(graphics, spriteBatch,
-                AnchoPantalla / 2 - (int)fuenteBotones.MeasureString(txtReanudar).X /*- espacio*/,
+                (int)punto.X + espacioMenuPausa,
                 AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtReanudar).Y,
-                (int)fuenteBotones.MeasureString(txtReanudar).X,
-                (int)fuenteBotones.MeasureString(txtReanudar).Y,
+                anchoMenuPausa / 2 - espacioMenuPausa * 2,
+                (int)fuenteBotones.MeasureString(txtReanudar).Y * 2,
                 Color.Green);
-            btnReanudar.SetTexto(txtReanudar, fuenteBotones, Color.Black,true);
+            btnReanudar.SetTexto(txtReanudar, fuenteBotones, Color.Black, true);
 
             btnSalir = new Boton(graphics, spriteBatch,
-                AnchoPantalla / 2 + espacio,
-                AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtSalir).Y ,
-                (int)fuenteBotones.MeasureString(txtSalir).X,
-                (int)fuenteBotones.MeasureString(txtSalir).Y*2,
+                AnchoPantalla / 2 + espacioMenuPausa,
+                AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtSalir).Y,
+                anchoMenuPausa / 2 - espacioMenuPausa * 2,
+                (int)fuenteBotones.MeasureString(txtReanudar).Y * 2,
                 Color.Red);
-            btnSalir.SetTexto(txtSalir, fuenteBotones, Color.Black,true);
+            btnSalir.SetTexto(txtSalir, fuenteBotones, Color.Black, true);
         }
         //------------------------HAY MARCIANOS------------------------
         public bool hayMarcianos()
@@ -755,6 +767,20 @@ namespace ProtectTheWorld
         //------------------------INICIALIZA LAS VARIABLES DEL JUEGO------------------------
         public void CargarJuego()
         {
+            //para el menu pausa
+            espacioMenuPausa = 20;
+            altoMenuPausa = AltoPantalla / 4;
+            anchoMenuPausa = (int)fuenteSub.MeasureString(preguntaPausa).X + espacioMenuPausa * 2;
+
+
+             rectanguloPausa = new Texture2D(graphics.GraphicsDevice,
+               anchoMenuPausa,
+               altoMenuPausa);
+            dataPausa = new Color[anchoMenuPausa * altoMenuPausa];
+            for (int i = 0; i < dataPausa.Length; ++i) dataPausa[i] = Color.LightGray;
+            rectanguloPausa.SetData(dataPausa);
+            puntoPausa = new Vector2(AnchoPantalla / 2 - (int)fuenteSub.MeasureString(preguntaPausa).X / 2 - espacioMenuPausa
+                , AltoPantalla / 2 - AltoPantalla / 6);
             //control
             modo = "jugando";
             //booleanas de control
@@ -818,16 +844,12 @@ namespace ProtectTheWorld
         }
         public void DibujaPausa()
         {
+           
             //dibujo el rectangulo
-            Texture2D rectangulo = new Texture2D(graphics.GraphicsDevice, AnchoPantalla/3, AltoPantalla/3);
-           Color[] data = new Color[AnchoPantalla/3 * AltoPantalla/3];
-            for (int i = 0; i < data.Length; ++i) data[i] = Color.LightGray;
-            rectangulo.SetData(data);
-            Vector2 punto = new Vector2(AnchoPantalla/2-AnchoPantalla/6,AltoPantalla/2-AltoPantalla/6);
-            spriteBatch.Draw(rectangulo, punto, Color.White);
+            spriteBatch.Draw(rectanguloPausa, puntoPausa, Color.White);
 
             //dibujo la pregunta
-            spriteBatch.DrawString(fuenteBotones, preguntaPausa, new Vector2(AnchoPantalla/2-(int)fuenteBotones.MeasureString(preguntaPausa).X/2,punto.Y), Color.Black);
+            spriteBatch.DrawString(fuenteSub, preguntaPausa, new Vector2(puntoPausa.X + espacioMenuPausa, puntoPausa.Y), Color.Black);
 
             //dibujo los botones
             btnReanudar.Dibuja();
@@ -1015,7 +1037,7 @@ namespace ProtectTheWorld
         //*****************************************************************OPCIONES*****************************************************************
         public void CrearBotonesOpciones()
         {
-            
+
         }
         public void DibujaOpciones()
         {
@@ -1131,7 +1153,7 @@ namespace ProtectTheWorld
                 }
             }
 
-           
+
         }
         //CRÉDITOS
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ CRÉDITOS
