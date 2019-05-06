@@ -51,3 +51,4 @@ Volver al menú principal desde el resto de pantallas.
 Lunes 6 de Mayo
 
 Solucionado el setTexto de la clase botón, para que si se le pasa centrado a true, centre el texto respecto a los dos ejes.
+Menú definitivo pausa juego.
