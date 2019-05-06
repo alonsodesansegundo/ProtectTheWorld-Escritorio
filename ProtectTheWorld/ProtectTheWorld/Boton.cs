@@ -25,6 +25,7 @@ namespace ProtectTheWorld
         private Color colorTexto;
         //Imagen boton
         private Texture2D imagen;
+        private bool centrado;
         public Boton(GraphicsDeviceManager graphics, SpriteBatch spriteBatch, int x, int y, int ancho, int alto, Color color)
         {
             //propiedades boton
@@ -41,6 +42,7 @@ namespace ProtectTheWorld
             for (int i = 0; i < data.Length; ++i) data[i] = color;
             rectangulo.SetData(data);
             this.punto = new Vector2(x, y);
+            centrado = false;
         }
         public bool GetBandera() { return this.bandera; }
         public void SetBandera(bool booleana) { this.bandera = booleana; }
@@ -49,13 +51,26 @@ namespace ProtectTheWorld
         {
             spriteBatch.Draw(rectangulo, punto, Color.White);
             if (texto != null)
-                spriteBatch.DrawString(fuente, texto, punto, colorTexto);
+                if (!centrado)
+                {
+                    spriteBatch.DrawString(fuente, texto, punto, colorTexto);
+                }
+                else
+                {
+                    //int a=  (int)fuente.MeasureString(texto).Y / 2;
+                    spriteBatch.DrawString(fuente, texto, 
+                        new Vector2(punto.X+ancho/2 - (int)fuente.MeasureString(texto).X/2,
+                        punto.Y+alto/ 2-(int)fuente.MeasureString(texto).Y / 2),
+                        colorTexto);
+                }
             if (imagen != null)
                 spriteBatch.Draw(this.imagen, this.contenedor, Color.White);
         }
         //Método que se utilizará para introducir texto dentro del boton
-        public void SetTexto(string texto, SpriteFont fuente, Color color)
+        public void SetTexto(string texto, SpriteFont fuente, Color color,bool centrado)
         {
+            if (centrado)
+                this.centrado = true;
             this.texto = texto;
             this.fuente = fuente;
             this.colorTexto = color;

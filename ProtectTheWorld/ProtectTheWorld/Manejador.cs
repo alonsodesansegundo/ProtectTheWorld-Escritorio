@@ -8,6 +8,7 @@ using Windows.UI.ViewManagement;
 
 namespace ProtectTheWorld
 {
+    //ENUMERADO PARA EL CONTROL DE ESCENAS
     enum EstadoJuego
     {
         Menu,
@@ -49,13 +50,17 @@ namespace ProtectTheWorld
         private ArrayList misColumnas;
         private List<BalaMarciano> balasMarcianos;
         private Boton btnPausa, btnReanudar, btnSalir, btnMusica;
-        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala, imgBalaMarciano, explosion, imgBtnPausa, imgBtnPlay;
+        private Texture2D imgMarciano1, imgMarciano2, imgNave, imgBala, imgBalaMarciano, explosion, imgBtnPausa, imgBtnPlay,imgMusicaOn,imgMusicaOff;
         private Nave miNave;
         private bool voyIzquierda, voyAbajo, estoyJugando, mueveNave, mejoraPuntuacion, pideSiglas, perdi;
 
         //**********************OPCIONES**********************
         private Boton btnVolverMenu;
         private Texture2D imgBtnVolver;
+
+        //**********************AYUDA**********************
+        private string txtFindalidad, txtNave, txtNiveles, txtMarcianos, tFin, tNave, tNiveles, tMarcianos,impacto1,impacto2,txtP,txtP2;
+        //**********************CONSTRUCTOR**********************
         public Manejador()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -213,6 +218,22 @@ namespace ProtectTheWorld
             preguntaPausa = "Que deseas hacer?";
             txtReanudar = "Reanudar";
             txtSalir = "Salir";
+            CargarTextosAyuda();
+        }
+        public void CargarTextosAyuda()
+        {
+            txtFindalidad = "La finalidad de este juego es sobrevivir el mayor tiempo posible y eliminar todos los marcianos que podamos antes de que estos nos invadan o nos eliminen.";
+            txtNave = "Nuestra nave espacial disparará a través de la barra espaciadora, y de manera que solo habrá un único proyectil de nuestra nave en la pantalla. Podremos mover dicha nave a través de las flechas (izquierda y/o derecha).";
+            txtNiveles = "Este juego contará con niveles infinitos, pero que irán aumentando en cuanto a dificultad. A medida que vayamos completando niveles, se cambiará una fila de marcianos de un impacto por marcianos de dos impactos. Una vez pasemos el nivel en el que solamente hay marcianos de dos impactos, volveremos al comienzo de los niveles, pero los marcianos se moverán más rápido.";
+            txtMarcianos = "Contamos con dos tipos de marcianos: marcianos que son eliminados tras recibir un único impacto, y otros marcianos que son eliminados tras recibir dos impactos. Estos últimos, en el momento que reciben el primer impacto se convierten en un marciano de un impacto.";
+            tFin = "Finalidad";
+            tNiveles = "Niveles";
+            tNave = "Nave";
+            tMarcianos = "Marcianos";
+            impacto1 = "Un impacto";
+            impacto2 = "Dos impactos";
+            txtP = "10 puntos";
+            txtP2 = "25 puntos";
         }
         //TODAS LAS FUENTES
         public void CargarFuentes()
@@ -233,6 +254,8 @@ namespace ProtectTheWorld
             imgBtnVolver = Content.Load<Texture2D>("back");
             imgBtnPausa = Content.Load<Texture2D>("pause");
             imgBtnPlay = Content.Load<Texture2D>("play");
+            imgMusicaOff = Content.Load<Texture2D>("musicano");
+            imgMusicaOn = Content.Load<Texture2D>("musica");
         }
         //MENÚ PRINCIPAL
         public void CrearBotonesMenu()
@@ -308,11 +331,11 @@ namespace ProtectTheWorld
             //dibujo el titulo del juego
             spriteBatch.DrawString(fuenteTitulo, titulo, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(titulo).X / 2, AltoPantalla / 6), Color.White);
             // set texto set imagen
-            btnJugar.SetTexto(txtJugar, fuenteBotones, Color.White);
-            btnOpciones.SetTexto(txtOpciones, fuenteBotones, Color.White);
-            btnAyuda.SetTexto(txtAyuda, fuenteBotones, Color.White);
-            btnRecords.SetTexto(txtRecords, fuenteBotones, Color.White);
-            btnCreditos.SetTexto(txtCreditos, fuenteBotones, Color.White);
+            btnJugar.SetTexto(txtJugar, fuenteBotones, Color.White,false);
+            btnOpciones.SetTexto(txtOpciones, fuenteBotones, Color.White,false);
+            btnAyuda.SetTexto(txtAyuda, fuenteBotones, Color.White,false);
+            btnRecords.SetTexto(txtRecords, fuenteBotones, Color.White,false);
+            btnCreditos.SetTexto(txtCreditos, fuenteBotones, Color.White,false);
             //jugar.SetImagen(fondoMenu);
             //BOTONES
             foreach (Boton b in botonesMenu)
@@ -472,23 +495,26 @@ namespace ProtectTheWorld
             btnPausa = new Boton(graphics, spriteBatch, AnchoPantalla - ancho, 0, ancho, ancho, Color.Transparent);
             btnPausa.SetImagen(imgBtnPausa);
 
+            btnMusica = new Boton(graphics, spriteBatch, AnchoPantalla - ancho * 2, 0, ancho, ancho, Color.Transparent);
+            btnMusica.SetImagen(imgMusicaOn);
+
             //int espacio = AnchoPantalla / 20;
             //(int)fuenteTitulo.MeasureString(titulo).X)
             btnReanudar = new Boton(graphics, spriteBatch,
                 AnchoPantalla / 2 - (int)fuenteBotones.MeasureString(txtReanudar).X /*- espacio*/,
-                AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtReanudar).Y ,
+                AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtReanudar).Y,
                 (int)fuenteBotones.MeasureString(txtReanudar).X,
                 (int)fuenteBotones.MeasureString(txtReanudar).Y,
                 Color.Green);
-            btnReanudar.SetTexto(txtReanudar, fuenteBotones, Color.Black);
+            btnReanudar.SetTexto(txtReanudar, fuenteBotones, Color.Black,true);
 
             btnSalir = new Boton(graphics, spriteBatch,
                 AnchoPantalla / 2 + espacio,
                 AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtSalir).Y ,
                 (int)fuenteBotones.MeasureString(txtSalir).X,
-                (int)fuenteBotones.MeasureString(txtSalir).Y,
+                (int)fuenteBotones.MeasureString(txtSalir).Y*2,
                 Color.Red);
-            btnSalir.SetTexto(txtSalir, fuenteBotones, Color.Black);
+            btnSalir.SetTexto(txtSalir, fuenteBotones, Color.Black,true);
         }
         //------------------------HAY MARCIANOS------------------------
         public bool hayMarcianos()
@@ -787,6 +813,7 @@ namespace ProtectTheWorld
             }
             //dibujo los botones
             btnPausa.Dibuja();
+            btnMusica.Dibuja();
             spriteBatch.End();
         }
         public void DibujaPausa()
