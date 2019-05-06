@@ -32,3 +32,22 @@ Colocación de los marcianos y la nave.
 Jueves 2 de Mayo
 
 Movimiento de la nave (mejorarlo), disparo de la nave y choque de la bala de la nave con los marcianos.
+
+Viernes 3 de Mayo
+
+Movimiento de los marcianos y puntuacion global.
+Disparo de los marcianos (falla, disparan todos a la vez)
+
+Sábado 4 de Mayo
+
+Solucionado el fallo del disparo de los marcianos.
+Volver al menú principal desde opciones.
+
+Domingo 5 de Mayo
+
+Menú pausa del juego (cambiaré el aspecto visual)
+Volver al menú principal desde el resto de pantallas.
+
+Lunes 6 de Mayo
+
+Solucionado el setTexto de la clase botón, para que si se le pasa centrado a true, centre el texto respecto a los dos ejes.
