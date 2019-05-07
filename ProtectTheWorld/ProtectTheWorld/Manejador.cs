@@ -67,7 +67,7 @@ namespace ProtectTheWorld
         //**********************AYUDA**********************
         private string txtFinalidad, txtNave, txtNiveles, txtMarcianos, tFin, tNave, tNiveles, tMarcianos, impacto1, impacto2, txtP, txtP2, modoAyuda;
         private Boton btnFinalidad, btnNiveles, btnNave, btnMarcianos;
-        private string[] infoFinalidad;
+        private string[] infoFinalidad,infoNave,infoNiveles,infoMarcianos;
         //**********************CONSTRUCTOR**********************
         public Manejador()
         {
@@ -236,9 +236,9 @@ namespace ProtectTheWorld
         public void CargarTextosAyuda()
         {
             txtFinalidad = "La finalidad de este juego es sobrevivir el mayor tiempo posible y eliminar todos los marcianos que podamos antes de que estos nos invadan o nos eliminen.";
-            txtNave = "Nuestra nave espacial disparará a través de la barra espaciadora, y de manera que solo habrá un único proyectil de nuestra nave en la pantalla. Podremos mover dicha nave a través de las flechas (izquierda y/o derecha).";
-            txtNiveles = "Este juego contará con niveles infinitos, pero que irán aumentando en cuanto a dificultad. A medida que vayamos completando niveles, se cambiará una fila de marcianos de un impacto por marcianos de dos impactos. Una vez pasemos el nivel en el que solamente hay marcianos de dos impactos, volveremos al comienzo de los niveles, pero los marcianos se moverán más rápido.";
-            txtMarcianos = "Contamos con dos tipos de marcianos: marcianos que son eliminados tras recibir un único impacto, y otros marcianos que son eliminados tras recibir dos impactos. Estos últimos, en el momento que reciben el primer impacto se convierten en un marciano de un impacto.";
+            txtNave = "Nuestra nave espacial disparara a traves de la barra espaciadora, y de manera que solo habra un unico proyectil de nuestra nave en la pantalla. Podremos mover dicha nave a traves de las flechas (izquierda y/o derecha).";
+            txtNiveles = "Este juego contara con niveles infinitos, pero que iran aumentando en cuanto a dificultad. A medida que vayamos completando niveles, se cambiara una fila de marcianos de un impacto por marcianos de dos impactos. Una vez pasemos el nivel en el que solamente hay marcianos de dos impactos, volveremos al comienzo de los niveles, pero los marcianos se moveran mas rapido.";
+            txtMarcianos = "Contamos con dos tipos de marcianos: marcianos que son eliminados tras recibir un unico impacto, y otros marcianos que son eliminados tras recibir dos impactos. Estos ultimos, en el momento que reciben el primer impacto se convierten en un marciano de un impacto.";
             tFin = "Finalidad";
             tNiveles = "Niveles";
             tNave = "Nave";
@@ -249,6 +249,9 @@ namespace ProtectTheWorld
             txtP2 = "25 puntos";
 
             infoFinalidad = txtFinalidad.Split(' ');
+            infoNave = txtNave.Split(' ');
+            infoNiveles = txtNiveles.Split(' ');
+            infoMarcianos = txtMarcianos.Split(' ');
         }
         //TODAS LAS FUENTES
         public void CargarFuentes()
@@ -1154,18 +1157,15 @@ namespace ProtectTheWorld
         }
         public void DibujaNiveles()
         {
-            spriteBatch.DrawString(fuenteTitulo, tNiveles, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 2), Color.White);
-
+            dibujaTexto(infoNiveles, fuenteSub);
         }
         public void DibujaNave()
         {
-            spriteBatch.DrawString(fuenteTitulo, tNave, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 2), Color.White);
-
+            dibujaTexto(infoNave, fuenteSub);
         }
         public void DibujaMarcianos()
         {
-            spriteBatch.DrawString(fuenteTitulo, tMarcianos, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 2), Color.White);
-
+            dibujaTexto(infoMarcianos, fuenteSub);
         }
         public void DibujaAyuda()
         {
