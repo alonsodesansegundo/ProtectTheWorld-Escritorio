@@ -67,6 +67,7 @@ namespace ProtectTheWorld
         //**********************AYUDA**********************
         private string txtFinalidad, txtNave, txtNiveles, txtMarcianos, tFin, tNave, tNiveles, tMarcianos, impacto1, impacto2, txtP, txtP2, modoAyuda;
         private Boton btnFinalidad, btnNiveles, btnNave, btnMarcianos;
+        private string[] infoFinalidad;
         //**********************CONSTRUCTOR**********************
         public Manejador()
         {
@@ -246,6 +247,8 @@ namespace ProtectTheWorld
             impacto2 = "Dos impactos";
             txtP = "10 puntos";
             txtP2 = "25 puntos";
+
+            infoFinalidad = txtFinalidad.Split(' ');
         }
         //TODAS LAS FUENTES
         public void CargarFuentes()
@@ -1121,9 +1124,33 @@ namespace ProtectTheWorld
             btnMarcianos.SetTexto(tMarcianos, fuenteBotones, Color.Black, true);
         }
 
+        public void dibujaTexto(String[] texto, SpriteFont fuente)
+        {
+            int espacio = 20;
+            int posX = espacio;
+            int primeraY = (int)fuenteTitulo.MeasureString(txtAyuda).Y+ AltoPantalla / 20+espacio;
+            foreach (string s in texto)
+            {
+                posX += (int)fuente.MeasureString(s).X;
+                if (posX >= AnchoPantalla)
+                {
+                    posX = espacio;
+                    primeraY += (int)fuente.MeasureString(s).Y;
+                    //c.drawText(s, posX, primeraY, pTexto);
+                    spriteBatch.DrawString(fuente, s, new Vector2(posX, primeraY), Color.White);
+                }
+                else
+                {
+                    posX = posX - (int)fuente.MeasureString(s).X;
+                    spriteBatch.DrawString(fuente, s, new Vector2(posX, primeraY), Color.White);
+                }
+
+                posX += (int)fuente.MeasureString(s).X+espacio;
+            }
+        }
         public void DibujaFinalidad()
         {
-            spriteBatch.DrawString(fuenteTitulo, tFin, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 2), Color.White);
+            dibujaTexto(infoFinalidad, fuenteSub);
         }
         public void DibujaNiveles()
         {
