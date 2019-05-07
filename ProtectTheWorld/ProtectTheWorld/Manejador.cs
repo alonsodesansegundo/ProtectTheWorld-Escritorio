@@ -65,7 +65,8 @@ namespace ProtectTheWorld
         private Texture2D imgBtnVolver;
 
         //**********************AYUDA**********************
-        private string txtFindalidad, txtNave, txtNiveles, txtMarcianos, tFin, tNave, tNiveles, tMarcianos, impacto1, impacto2, txtP, txtP2;
+        private string txtFinalidad, txtNave, txtNiveles, txtMarcianos, tFin, tNave, tNiveles, tMarcianos, impacto1, impacto2, txtP, txtP2, modoAyuda;
+        private Boton btnFinalidad, btnNiveles, btnNave, btnMarcianos;
         //**********************CONSTRUCTOR**********************
         public Manejador()
         {
@@ -125,6 +126,9 @@ namespace ProtectTheWorld
 
             //Botones del juego
             CrearBotonesJuego();
+
+            //Botones de la ayuda
+            CrearBotonesAyuda();
 
             //Botones de opciones
             CrearBotonesOpciones();
@@ -215,6 +219,8 @@ namespace ProtectTheWorld
         //TODOS LOS TEXTOS
         public void CargarTextos()
         {
+            modoAyuda = "principal";
+
             titulo = "Protect the World";
             txtJugar = "Jugar";
             txtOpciones = "Opciones";
@@ -228,7 +234,7 @@ namespace ProtectTheWorld
         }
         public void CargarTextosAyuda()
         {
-            txtFindalidad = "La finalidad de este juego es sobrevivir el mayor tiempo posible y eliminar todos los marcianos que podamos antes de que estos nos invadan o nos eliminen.";
+            txtFinalidad = "La finalidad de este juego es sobrevivir el mayor tiempo posible y eliminar todos los marcianos que podamos antes de que estos nos invadan o nos eliminen.";
             txtNave = "Nuestra nave espacial disparará a través de la barra espaciadora, y de manera que solo habrá un único proyectil de nuestra nave en la pantalla. Podremos mover dicha nave a través de las flechas (izquierda y/o derecha).";
             txtNiveles = "Este juego contará con niveles infinitos, pero que irán aumentando en cuanto a dificultad. A medida que vayamos completando niveles, se cambiará una fila de marcianos de un impacto por marcianos de dos impactos. Una vez pasemos el nivel en el que solamente hay marcianos de dos impactos, volveremos al comienzo de los niveles, pero los marcianos se moverán más rápido.";
             txtMarcianos = "Contamos con dos tipos de marcianos: marcianos que son eliminados tras recibir un único impacto, y otros marcianos que son eliminados tras recibir dos impactos. Estos últimos, en el momento que reciben el primer impacto se convierten en un marciano de un impacto.";
@@ -505,7 +511,7 @@ namespace ProtectTheWorld
             btnMusica = new Boton(graphics, spriteBatch, AnchoPantalla - ancho * 2, 0, ancho, ancho, Color.Transparent);
             btnMusica.SetImagen(imgMusicaOn);
 
-           
+
             espacioMenuPausa = 20;
             altoMenuPausa = AltoPantalla / 4;
             Vector2 punto = new Vector2(AnchoPantalla / 2 - (int)fuenteSub.MeasureString(preguntaPausa).X / 2 - espacioMenuPausa
@@ -773,9 +779,9 @@ namespace ProtectTheWorld
             anchoMenuPausa = (int)fuenteSub.MeasureString(preguntaPausa).X + espacioMenuPausa * 2;
 
 
-             rectanguloPausa = new Texture2D(graphics.GraphicsDevice,
-               anchoMenuPausa,
-               altoMenuPausa);
+            rectanguloPausa = new Texture2D(graphics.GraphicsDevice,
+              anchoMenuPausa,
+              altoMenuPausa);
             dataPausa = new Color[anchoMenuPausa * altoMenuPausa];
             for (int i = 0; i < dataPausa.Length; ++i) dataPausa[i] = Color.LightGray;
             rectanguloPausa.SetData(dataPausa);
@@ -844,7 +850,7 @@ namespace ProtectTheWorld
         }
         public void DibujaPausa()
         {
-           
+
             //dibujo el rectangulo
             spriteBatch.Draw(rectanguloPausa, puntoPausa, Color.White);
 
@@ -1078,12 +1084,91 @@ namespace ProtectTheWorld
 
         //AYUDA
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ AYUDA
+        public int DameMasAncho(string[] lista, SpriteFont fuente)
+        {
+            float auxiliar = 0;
+            foreach (string a in lista)
+            {
+                if (fuente.MeasureString(a).X > auxiliar)
+                    auxiliar = fuente.MeasureString(a).X;
+            }
+            return (int)auxiliar;
+        }
+        public void CrearBotonesAyuda()
+        {
+            string[] textoBotonesAyuda = new string[4];
+            textoBotonesAyuda[0] = tFin;
+            textoBotonesAyuda[1] = tNiveles;
+            textoBotonesAyuda[2] = tNave;
+            textoBotonesAyuda[3] = tMarcianos;
+
+            int ancho = DameMasAncho(textoBotonesAyuda, fuenteBotones);
+            int masLateral = AnchoPantalla / 50;
+            ancho += masLateral;
+
+            int espacio = AltoPantalla / 100;
+            int alto = 60;
+            btnFinalidad = new Boton(graphics, spriteBatch, AnchoPantalla / 2 - ancho / 2, AltoPantalla / 4, ancho, alto, Color.White);
+            btnFinalidad.SetTexto(tFin, fuenteBotones, Color.Black, true);
+
+            btnNiveles = new Boton(graphics, spriteBatch, AnchoPantalla / 2 - ancho / 2, AltoPantalla / 4 + espacio + alto, ancho, alto, Color.White);
+            btnNiveles.SetTexto(tNiveles, fuenteBotones, Color.Black, true);
+
+            btnNave = new Boton(graphics, spriteBatch, AnchoPantalla / 2 - ancho / 2, AltoPantalla / 4 + espacio * 2 + alto * 2, ancho, alto, Color.White);
+            btnNave.SetTexto(tNave, fuenteBotones, Color.Black, true);
+
+            btnMarcianos = new Boton(graphics, spriteBatch, AnchoPantalla / 2 - ancho / 2, AltoPantalla / 4 + espacio * 3 + alto * 3, ancho, alto, Color.White);
+            btnMarcianos.SetTexto(tMarcianos, fuenteBotones, Color.Black, true);
+        }
+
+        public void DibujaFinalidad()
+        {
+            spriteBatch.DrawString(fuenteTitulo, tFin, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 2), Color.White);
+        }
+        public void DibujaNiveles()
+        {
+            spriteBatch.DrawString(fuenteTitulo, tNiveles, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 2), Color.White);
+
+        }
+        public void DibujaNave()
+        {
+            spriteBatch.DrawString(fuenteTitulo, tNave, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 2), Color.White);
+
+        }
+        public void DibujaMarcianos()
+        {
+            spriteBatch.DrawString(fuenteTitulo, tMarcianos, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 2), Color.White);
+
+        }
         public void DibujaAyuda()
         {
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            spriteBatch.DrawString(fuenteTitulo, txtAyuda, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
+            spriteBatch.DrawString(fuenteTitulo, txtAyuda, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 20), Color.White);
             btnVolverMenu.Dibuja();
+
+            switch (modoAyuda)
+            {
+                case "principal":
+                    //botones para acceder a informacion
+                    btnFinalidad.Dibuja();
+                    btnNiveles.Dibuja();
+                    btnNave.Dibuja();
+                    btnMarcianos.Dibuja();
+                    break;
+                case "finalidad":
+                    DibujaFinalidad();
+                    break;
+                case "niveles":
+                    DibujaNiveles();
+                    break;
+                case "nave":
+                    DibujaNave();
+                    break;
+                case "marcianos":
+                    DibujaMarcianos();
+                    break;
+            }
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ OPCIONES
@@ -1099,17 +1184,64 @@ namespace ProtectTheWorld
                 {
                     //si el boton izq está pulsado
                     case ButtonState.Pressed:
+                        //si estoy en prinicpal y pulso alguno de los botones de informacion
+                        if (modoAyuda == "principal")
+                        {
+                            if (ClickIzq(btnFinalidad))
+                                btnFinalidad.SetBandera(true);
+
+                            if (ClickIzq(btnNiveles))
+                                btnNiveles.SetBandera(true);
+
+                            if (ClickIzq(btnNave))
+                                btnNave.SetBandera(true);
+
+                            if (ClickIzq(btnMarcianos))
+                                btnMarcianos.SetBandera(true);
+                        }
+
                         //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
                         if (ClickIzq(btnVolverMenu))
                             btnVolverMenu.SetBandera(true);
                         break;
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
+                        //si pulso el boton volver
                         if (LevantoIzq(btnVolverMenu))
-                            estadoActualJuego = EstadoJuego.Menu;
+                        {
+                            //estoy en principal, vuelvo al menu
+                            if (modoAyuda == "principal")
+                            {
+                                estadoActualJuego = EstadoJuego.Menu;
+                            }
+                            else
+                            {
+                                //si no estoy en principal, voy
+                                modoAyuda = "principal";
+                            }
+                        }
 
+                        //si estoy en prinicpal y pulso alguno de los botones de informacion
+                        if (modoAyuda == "principal")
+                        {
+                            if (LevantoIzq(btnFinalidad))
+                                modoAyuda = "finalidad";
+
+                            if (LevantoIzq(btnNiveles))
+                                modoAyuda = "niveles";
+
+                            if (LevantoIzq(btnNave))
+                                modoAyuda = "nave";
+
+                            if (LevantoIzq(btnMarcianos))
+                                modoAyuda = "marcianos";
+                        }
                         //pongo a false las banderas de todos los botones del menu opciones
                         btnVolverMenu.SetBandera(false);
+                        btnFinalidad.SetBandera(false);
+                        btnNiveles.SetBandera(false);
+                        btnNave.SetBandera(false);
+                        btnMarcianos.SetBandera(false);
                         break;
                 }
             }
