@@ -38,11 +38,17 @@ namespace ProtectTheWorld
             this.bandera = false;
             this.contenedor = new Rectangle(x, y, ancho, alto);
             this.rectangulo = new Texture2D(graphics.GraphicsDevice, ancho, alto);
-            data = new Color[ancho * alto];
+            this.data = new Color[ancho * alto];
             for (int i = 0; i < data.Length; ++i) data[i] = color;
             rectangulo.SetData(data);
             this.punto = new Vector2(x, y);
             centrado = false;
+        }
+        public void SetColor(Color nuevoColor)
+        {
+            this.data = new Color[ancho * alto];
+            for (int i = 0; i < data.Length; ++i) data[i] = nuevoColor;
+            rectangulo.SetData(data);
         }
         public bool GetBandera() { return this.bandera; }
         public void SetBandera(bool booleana) { this.bandera = booleana; }
