@@ -116,6 +116,11 @@ namespace ProtectTheWorld
             AltoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Height;
             AnchoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Width;
 
+            //NAVE CON LA QUE VOY A JUGAR
+            numNave = 1;
+            //MUSICA SI O NO
+            boolMusica = true;
+
             //TODAS LAS FUENTES
             CargarFuentes();
 
@@ -413,6 +418,14 @@ namespace ProtectTheWorld
         }
         public void InicializaVariablesJuego()
         {
+            if (boolMusica)
+            {
+                btnMusica.SetImagen(imgMusicaOn);
+            }
+            else
+            {
+                btnMusica.SetImagen(imgMusicaOff);
+            }
             //para el menu pausa
             espacioMenuPausa = 20;
             altoMenuPausa = AltoPantalla / 4;
@@ -467,6 +480,18 @@ namespace ProtectTheWorld
             miNave = new Nave(graphics, spriteBatch, imgNave1,
                 AnchoPantalla / 2 - anchoNave / 2, AltoPantalla - altoNave, anchoNave, altoNave,
                anchoProyectilNave, altoProyectilNave, vBala, imgBala);
+            switch (numNave)
+            {
+                case 1:
+                    miNave.setImagen(imgNave1);
+                    break;
+                case 2:
+                    miNave.setImagen(imgNave2);
+                    break;
+                case 3:
+                    miNave.setImagen(imgNave3);
+                    break;
+            }
         }
 
         public void CargarTextosJuego()
@@ -482,7 +507,7 @@ namespace ProtectTheWorld
             btnPausa.SetImagen(imgBtnPausa);
 
             btnMusica = new Boton(graphics, spriteBatch, AnchoPantalla - ancho * 2, 0, ancho, ancho, Color.Transparent);
-            btnMusica.SetImagen(imgMusicaOn);
+
 
 
             espacioMenuPausa = 20;
@@ -914,10 +939,10 @@ namespace ProtectTheWorld
                     //MOVIMIENTO BALA NAVE
                     mueveBalaNave();
                     //GESTION PULSACION BOTON PAUSA
-                    GestionaMenuPausa();
+                    GestionaBotonesJuego();
                     break;
                 case "pausa":
-                    GestionaMenuPausa();
+                    GestionaBotonesJuego();
                     break;
                 case "hacerInsert":
                     break;
@@ -926,7 +951,7 @@ namespace ProtectTheWorld
             gestionaTeclado();
         }
         //------------------------PULSA PAUSA------------------------
-        public void GestionaMenuPausa()
+        public void GestionaBotonesJuego()
         {
             //si cambia el estado del click izq
             if (estadoClickIzq != Mouse.GetState().LeftButton)
@@ -941,11 +966,17 @@ namespace ProtectTheWorld
                         //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
                         if (ClickIzq(btnPausa))
                             btnPausa.SetBandera(true);
+                       
+                        if (ClickIzq(btnMusica)&&modo=="jugando")
+                            btnMusica.SetBandera(true);
+                        if (modo == "pausa")
+                        {
+                            if (ClickIzq(btnReanudar))
+                                btnReanudar.SetBandera(true);
 
-                        if (ClickIzq(btnReanudar))
-                            btnReanudar.SetBandera(true);
-                        if (ClickIzq(btnSalir))
-                            btnSalir.SetBandera(true);
+                            if (ClickIzq(btnSalir))
+                                btnSalir.SetBandera(true);
+                        }
                         break;
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
@@ -972,10 +1003,23 @@ namespace ProtectTheWorld
                         if (LevantoIzq(btnSalir))
                             estadoActualJuego = EstadoJuego.Menu;
 
+                        if (LevantoIzq(btnMusica))
+                        {
+                            if (boolMusica)
+                            {
+                                btnMusica.SetImagen(imgMusicaOff);
+                            }
+                            else
+                            {
+                                btnMusica.SetImagen(imgMusicaOn);
+                            }
+                            boolMusica = !boolMusica;
+                        }
                         //pongo a false las banderas de todos los botones del menu opciones
                         btnPausa.SetBandera(false);
                         btnReanudar.SetBandera(false);
                         btnSalir.SetBandera(false);
+                        btnMusica.SetBandera(false);
                         break;
                 }
             }
@@ -1037,7 +1081,7 @@ namespace ProtectTheWorld
         }
         public void gestionaMenuPausa()
         {
-            GestionaMenuPausa();
+            GestionaBotonesJuego();
 
             PulsaReanudar();
             PulsaSalir();
@@ -1046,8 +1090,6 @@ namespace ProtectTheWorld
         //*****************************************************************OPCIONES*****************************************************************
         public void CargarOpciones()
         {
-            numNave = 1;
-            boolMusica = true;
             CargarTextosOpciones();
             CrearBotonesOpciones();
         }
@@ -1340,19 +1382,19 @@ namespace ProtectTheWorld
         }
         public void MarcianosPuntuaciones()
         {
-            int tamaño = AnchoPantalla/20;
+            int tamaño = AnchoPantalla / 20;
             int espacio = AnchoPantalla / 20;
             //dibujo puntuacion 10
             Vector2 p = new Vector2(espacio, AltoPantalla - fuenteBotones.MeasureString(txtP).Y - espacio / 2);
-            spriteBatch.DrawString(fuenteBotones, txtP,p , Color.White);
-            Rectangle r = new Rectangle(espacio+ (int)fuenteBotones.MeasureString(txtP).X/2-tamaño/2,
-              (int)p.Y-tamaño,
+            spriteBatch.DrawString(fuenteBotones, txtP, p, Color.White);
+            Rectangle r = new Rectangle(espacio + (int)fuenteBotones.MeasureString(txtP).X / 2 - tamaño / 2,
+              (int)p.Y - tamaño,
               tamaño, tamaño);
             spriteBatch.Draw(imgMarciano1, r, Color.White);
 
             //dibujo puntuacion 25
-            spriteBatch.DrawString(fuenteBotones, txtP2, new Vector2(AnchoPantalla-espacio- (int)fuenteBotones.MeasureString(txtP2).X,p.Y), Color.White);
-            Rectangle r2 = new Rectangle(AnchoPantalla - espacio - (int)fuenteBotones.MeasureString(txtP2).X+tamaño/2,
+            spriteBatch.DrawString(fuenteBotones, txtP2, new Vector2(AnchoPantalla - espacio - (int)fuenteBotones.MeasureString(txtP2).X, p.Y), Color.White);
+            Rectangle r2 = new Rectangle(AnchoPantalla - espacio - (int)fuenteBotones.MeasureString(txtP2).X + tamaño / 2,
                 (int)p.Y - tamaño,
                 tamaño, tamaño);
             spriteBatch.Draw(imgMarciano2, r2, Color.White);
