@@ -52,7 +52,8 @@ namespace ProtectTheWorld
         private Boton btnPausa, btnReanudar, btnSalir, btnMusica;
         private Texture2D imgMarciano1, imgMarciano2, imgNave1, imgNave2, imgNave3, imgBala, imgBalaMarciano, explosion, imgBtnPausa, imgBtnPlay, imgMusicaOn, imgMusicaOff;
         private Nave miNave;
-        private bool voyIzquierda, voyAbajo, estoyJugando, mueveNave, mejoraPuntuacion, pideSiglas, perdi;
+        private bool voyIzquierda, voyAbajo;
+        //estoyJugando, mueveNave, mejoraPuntuacion, pideSiglas, perdi;
 
         //menu pausa
         private int altoMenuPausa, anchoMenuPausa, espacioMenuPausa;
@@ -60,6 +61,16 @@ namespace ProtectTheWorld
         private Color[] dataPausa;
         private Vector2 puntoPausa;
 
+        //menu introduce tus siglas
+        private Texture2D rectanguloSiglas;
+        private Color[] dataSiglas;
+        private string txtIntroduceSiglas;
+        private int altoMenuSiglas,anchoMenuSiglas,espacioMenuSiglas;
+        private Vector2 puntoSiglas;
+        private Boton btnSiglaArriba, btnSiglaArriba2, btnSiglaArriba3, btnSiglaAbajo, btnSiglaAbajo2, btnSiglaAbajo3;
+        private Texture2D trianguloArriba, trianguloAbajo;
+        private char[] abecedario;
+        private char[] siglas;
         //**********************OPCIONES**********************
         private Boton btnVolverMenu, btnNave1, btnNave2, btnNave3, btnMusicaSi, btnMusicaNo;
         private string txtSeleccionaNave, txtMusica, txtSi, txtNo;
@@ -71,6 +82,12 @@ namespace ProtectTheWorld
         private string txtFinalidad, txtNave, txtNiveles, txtMarcianos, tFin, tNave, tNiveles, tMarcianos, impacto1, impacto2, txtP, txtP2, modoAyuda;
         private Boton btnFinalidad, btnNiveles, btnNave, btnMarcianos;
         private string[] infoFinalidad, infoNave, infoNiveles, infoMarcianos;
+
+        //**********************RECORDS**********************
+        private string a;
+
+        //**********************CREDITOS**********************
+        private string txtFuente, txtImagenes, txtImg, txtImg2, txtMusic, txtHecho;
         //**********************CONSTRUCTOR**********************
         public Manejador()
         {
@@ -138,6 +155,12 @@ namespace ProtectTheWorld
 
             //CARGO LOS DATOS DE LA AYUDA
             CargarAyuda();
+
+            //CARGO LOS DATOS DE LOS RECORDS
+            CargarRecords();
+
+            //CARGO LOS DATOS DE LOS CREDITOS
+            CargarCreditos();
 
             //BOTON PARA VOLVER DESDE LAS DIFERENTES PANTALLAS
             int ancho = AnchoPantalla / 25;
@@ -250,6 +273,8 @@ namespace ProtectTheWorld
             imgBtnPlay = Content.Load<Texture2D>("play");
             imgMusicaOff = Content.Load<Texture2D>("musicano");
             imgMusicaOn = Content.Load<Texture2D>("musica");
+            trianguloAbajo = Content.Load<Texture2D>("triangulodown");
+            trianguloArriba = Content.Load<Texture2D>("trianguloup");
         }
 
         //*****************************************************************MENU*****************************************************************
@@ -418,6 +443,11 @@ namespace ProtectTheWorld
         }
         public void InicializaVariablesJuego()
         {
+            //siglas primeras
+            siglas = new char[3];
+            siglas[0] = 'A';
+            siglas[1] = 'A';
+            siglas[2] = 'A';
             if (boolMusica)
             {
                 btnMusica.SetImagen(imgMusicaOn);
@@ -427,10 +457,9 @@ namespace ProtectTheWorld
                 btnMusica.SetImagen(imgMusicaOff);
             }
             //para el menu pausa
-            espacioMenuPausa = 20;
-            altoMenuPausa = AltoPantalla / 4;
+            //espacioMenuPausa = 20;
+            //altoMenuPausa = AltoPantalla / 4;
             anchoMenuPausa = (int)fuenteSub.MeasureString(preguntaPausa).X + espacioMenuPausa * 2;
-
 
             rectanguloPausa = new Texture2D(graphics.GraphicsDevice,
               anchoMenuPausa,
@@ -440,10 +469,23 @@ namespace ProtectTheWorld
             rectanguloPausa.SetData(dataPausa);
             puntoPausa = new Vector2(AnchoPantalla / 2 - (int)fuenteSub.MeasureString(preguntaPausa).X / 2 - espacioMenuPausa
                 , AltoPantalla / 2 - AltoPantalla / 6);
+
+            //para el menu siglas
+            //espacioMenuSiglas = 20;
+            //altoMenuSiglas = AltoPantalla / 4;
+            anchoMenuSiglas = (int)fuenteSub.MeasureString(txtIntroduceSiglas).X + espacioMenuSiglas * 2;
+
+            rectanguloSiglas = new Texture2D(graphics.GraphicsDevice,
+                anchoMenuSiglas,
+                altoMenuSiglas);
+            dataSiglas = new Color[anchoMenuSiglas * altoMenuSiglas];
+            for (int i = 0; i < dataSiglas.Length; ++i) dataSiglas[i] = Color.LightGray;
+            rectanguloSiglas.SetData(dataSiglas);
+            puntoSiglas = new Vector2(AnchoPantalla / 2 - (int)fuenteSub.MeasureString(txtIntroduceSiglas).X / 2 - espacioMenuSiglas
+                , AltoPantalla / 2 - AltoPantalla / 6);
+
             //control
             modo = "jugando";
-            //booleanas de control
-            estoyJugando = true;
             auxiliar = 0;
             puntuacionGlobal = 0;
             //marcianos
@@ -499,6 +541,12 @@ namespace ProtectTheWorld
             preguntaPausa = "Que deseas hacer?";
             txtReanudar = "Reanudar";
             txtSalir = "Salir";
+            txtIntroduceSiglas = "Introduce tus siglas";
+            abecedario=new char[26];
+            for (int i = 0; i < abecedario.Length; i++)
+            {
+                abecedario[i]=((char)('A' + i));
+            }
         }
         public void CrearBotonesJuego()
         {
@@ -507,8 +555,6 @@ namespace ProtectTheWorld
             btnPausa.SetImagen(imgBtnPausa);
 
             btnMusica = new Boton(graphics, spriteBatch, AnchoPantalla - ancho * 2, 0, ancho, ancho, Color.Transparent);
-
-
 
             espacioMenuPausa = 20;
             altoMenuPausa = AltoPantalla / 4;
@@ -531,6 +577,34 @@ namespace ProtectTheWorld
                 (int)fuenteBotones.MeasureString(txtReanudar).Y * 2,
                 Color.Red);
             btnSalir.SetTexto(txtSalir, fuenteBotones, Color.Black, true);
+
+            //introduce tus siglas
+            espacioMenuSiglas = 20;
+            altoMenuSiglas = AltoPantalla / 4;
+            anchoMenuSiglas = (int)fuenteSub.MeasureString(txtIntroduceSiglas).X + espacioMenuSiglas * 2;
+
+            puntoSiglas = new Vector2(AnchoPantalla / 2 - (int)fuenteSub.MeasureString(txtIntroduceSiglas).X / 2 - espacioMenuSiglas
+                , AltoPantalla / 2 - AltoPantalla / 6);
+            //botones arriba
+            btnSiglaArriba = new Boton(graphics, spriteBatch,
+             (int)puntoSiglas.X + espacioMenuSiglas,
+                AltoPantalla / 2 - ancho,
+                ancho, ancho, Color.Transparent);
+            btnSiglaArriba.SetImagen(trianguloArriba);
+
+            btnSiglaArriba2 = new Boton(graphics, spriteBatch,
+             AnchoPantalla/2-ancho/2,
+                AltoPantalla / 2 - ancho,
+                ancho, ancho, Color.Transparent);
+            btnSiglaArriba2.SetImagen(trianguloArriba);
+
+            btnSiglaArriba3 = new Boton(graphics, spriteBatch,
+             (int)puntoSiglas.X+anchoMenuSiglas-ancho-espacioMenuSiglas,
+                AltoPantalla / 2 - ancho,
+                ancho, ancho, Color.Transparent);
+            btnSiglaArriba3.SetImagen(trianguloArriba);
+
+            
         }
 
 
@@ -544,19 +618,18 @@ namespace ProtectTheWorld
             //if (teclado.IsKeyDown(Keys.Down))
             //    estoyJugando = false;
 
-            if (estoyJugando)
-                if (estoyJugando)
-                {
-                    //SI PULSA LA FLECHA DRCH
-                    if (teclado.IsKeyDown(Keys.Right))
-                        miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
-                    //SI PULSA LA FLECHA IZQ
-                    if (teclado.IsKeyDown(Keys.Left))
-                        miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
-                    //SI PULSA EL ESPACIO
-                    if (teclado.IsKeyDown(Keys.Space))
-                        miNave.disparar();
-                }
+            if (modo == "jugando")
+            {
+                //SI PULSA LA FLECHA DRCH
+                if (teclado.IsKeyDown(Keys.Right))
+                    miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+                //SI PULSA LA FLECHA IZQ
+                if (teclado.IsKeyDown(Keys.Left))
+                    miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+                //SI PULSA EL ESPACIO
+                if (teclado.IsKeyDown(Keys.Space))
+                    miNave.disparar();
+            }
 
 
             //CONFIGURACION ALTERNATIVA
@@ -739,8 +812,8 @@ namespace ProtectTheWorld
 
                     miNave.setImagen(explosion);
                     //perdi
-                    estoyJugando = false;
-                    mueveNave = false;
+                    modo = "perdi";
+                    //mueveNave = false;
                     //acabaMusica();
                     //if (mejoraPuntuacion())
                     //{
@@ -750,7 +823,7 @@ namespace ProtectTheWorld
                     //{
                     //    perdi = true;
                     //}
-                    perdi = true;
+                    //perdi = true;
                 }
                 else
                 {
@@ -874,11 +947,12 @@ namespace ProtectTheWorld
             //dibujo los botones
             btnPausa.Dibuja();
             btnMusica.Dibuja();
+
+            //DibujaIntroduceSiglas();
             spriteBatch.End();
         }
         public void DibujaPausa()
         {
-
             //dibujo el rectangulo
             spriteBatch.Draw(rectanguloPausa, puntoPausa, Color.White);
 
@@ -888,6 +962,19 @@ namespace ProtectTheWorld
             //dibujo los botones
             btnReanudar.Dibuja();
             btnSalir.Dibuja();
+
+        }
+        public void DibujaIntroduceSiglas()
+        {
+            //dibujo el rectangulo
+            spriteBatch.Draw(rectanguloSiglas, puntoSiglas, Color.White);
+            //dibujo el texto
+            spriteBatch.DrawString(fuenteSub, txtIntroduceSiglas, new Vector2(puntoSiglas.X + espacioMenuSiglas, puntoSiglas.Y), Color.Black);
+            //botones sigla arriba
+            btnSiglaArriba.Dibuja();
+            btnSiglaArriba2.Dibuja();
+            btnSiglaArriba3.Dibuja();
+            //siglas
 
         }
         public void DibujaGameplay()
@@ -966,8 +1053,8 @@ namespace ProtectTheWorld
                         //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
                         if (ClickIzq(btnPausa))
                             btnPausa.SetBandera(true);
-                       
-                        if (ClickIzq(btnMusica)&&modo=="jugando")
+
+                        if (ClickIzq(btnMusica) && modo == "jugando")
                             btnMusica.SetBandera(true);
                         if (modo == "pausa")
                         {
@@ -1100,7 +1187,6 @@ namespace ProtectTheWorld
             txtSi = "Si";
             txtNo = "No";
         }
-
         public void CrearBotonesOpciones()
         {
             int tamaño = AnchoPantalla / 20;
@@ -1509,7 +1595,11 @@ namespace ProtectTheWorld
             }
         }
 
-        //RÉCORDS        
+        //*****************************************************************RECORDS*****************************************************************
+        public void CargarRecords()
+        {
+
+        }
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ RÉCORDS
         public void DibujaRecords()
         {
@@ -1549,7 +1639,26 @@ namespace ProtectTheWorld
 
 
         }
-        //CRÉDITOS
+
+        //*****************************************************************CRÉDITOS*****************************************************************
+        public void CargarCreditos()
+        {
+            CargarTextosCreditos();
+        }
+        public void CargarTextosCreditos()
+        {
+
+            txtFuente = "Fuente";
+            txtImagenes = "Imagenes";
+            txtImg = "https://game-icons.net";
+            txtImg2 = "https://pixabay.com";
+            txtMusic = "https://patrickdearteaga.com/ ";
+            //txtFont = contexto.getString(R.string.font1);
+            txtHecho = "Realizado y dirigido por";
+            //txtAyuda = contexto.getString(R.string.conAyuda);
+            //txtYotube = contexto.getString(R.string.youtube);
+            //txtCanal = contexto.getString(R.string.canalYT);
+        }
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ CRÉDITOS
         public void DibujaCreditos()
         {
