@@ -64,12 +64,12 @@ namespace ProtectTheWorld
         //menu introduce tus siglas
         private Texture2D rectanguloSiglas;
         private Color[] dataSiglas;
-        private string txtIntroduceSiglas;
-        private int altoMenuSiglas,anchoMenuSiglas,espacioMenuSiglas;
+        private string txtIntroduceSiglas, txtEnviar;
+        private int altoMenuSiglas, anchoMenuSiglas, espacioMenuSiglas;
         private Vector2 puntoSiglas;
-        private Boton btnSiglaArriba, btnSiglaArriba2, btnSiglaArriba3, btnSiglaAbajo, btnSiglaAbajo2, btnSiglaAbajo3;
+        private Boton btnSiglaArriba, btnSiglaArriba2, btnSiglaArriba3, btnSiglaAbajo, btnSiglaAbajo2, btnSiglaAbajo3, btnEnviarRecord;
         private Texture2D trianguloArriba, trianguloAbajo;
-        private char[] abecedario;
+        private ArrayList abecedario;
         private char[] siglas;
         //**********************OPCIONES**********************
         private Boton btnVolverMenu, btnNave1, btnNave2, btnNave3, btnMusicaSi, btnMusicaNo;
@@ -513,7 +513,7 @@ namespace ProtectTheWorld
             voyIzquierda = false;
 
             //nave
-            vNave = 10;
+            vNave = 6;
             vBala = 6;
             altoNave = AnchoPantalla / 20;
             anchoNave = AnchoPantalla / 20;
@@ -542,10 +542,11 @@ namespace ProtectTheWorld
             txtReanudar = "Reanudar";
             txtSalir = "Salir";
             txtIntroduceSiglas = "Introduce tus siglas";
-            abecedario=new char[26];
-            for (int i = 0; i < abecedario.Length; i++)
+            txtEnviar = "Enviar";
+            abecedario = new ArrayList();
+            for (int i = 0; i < 26; i++)
             {
-                abecedario[i]=((char)('A' + i));
+                abecedario.Add((char)('A' + i));
             }
         }
         public void CrearBotonesJuego()
@@ -580,7 +581,7 @@ namespace ProtectTheWorld
 
             //introduce tus siglas
             espacioMenuSiglas = 20;
-            altoMenuSiglas = AltoPantalla / 4;
+            altoMenuSiglas = AltoPantalla / 3;
             anchoMenuSiglas = (int)fuenteSub.MeasureString(txtIntroduceSiglas).X + espacioMenuSiglas * 2;
 
             puntoSiglas = new Vector2(AnchoPantalla / 2 - (int)fuenteSub.MeasureString(txtIntroduceSiglas).X / 2 - espacioMenuSiglas
@@ -593,18 +594,42 @@ namespace ProtectTheWorld
             btnSiglaArriba.SetImagen(trianguloArriba);
 
             btnSiglaArriba2 = new Boton(graphics, spriteBatch,
-             AnchoPantalla/2-ancho/2,
+             AnchoPantalla / 2 - ancho / 2,
                 AltoPantalla / 2 - ancho,
                 ancho, ancho, Color.Transparent);
             btnSiglaArriba2.SetImagen(trianguloArriba);
 
             btnSiglaArriba3 = new Boton(graphics, spriteBatch,
-             (int)puntoSiglas.X+anchoMenuSiglas-ancho-espacioMenuSiglas,
+             (int)puntoSiglas.X + anchoMenuSiglas - ancho - espacioMenuSiglas,
                 AltoPantalla / 2 - ancho,
                 ancho, ancho, Color.Transparent);
             btnSiglaArriba3.SetImagen(trianguloArriba);
 
-            
+            //botones abajo
+            btnSiglaAbajo = new Boton(graphics, spriteBatch,
+                             (int)puntoSiglas.X + espacioMenuSiglas,
+                              (int)puntoSiglas.Y + espacioMenuSiglas * 2 + (int)fuenteSub.MeasureString(txtIntroduceSiglas).Y + ancho + (int)fuenteBotones.MeasureString('A'.ToString()).Y,
+                              ancho, ancho, Color.Transparent);
+            btnSiglaAbajo.SetImagen(trianguloAbajo);
+
+            btnSiglaAbajo2 = new Boton(graphics, spriteBatch,
+                           AnchoPantalla / 2 - ancho / 2,
+                              (int)puntoSiglas.Y + espacioMenuSiglas * 2 + (int)fuenteSub.MeasureString(txtIntroduceSiglas).Y + ancho + (int)fuenteBotones.MeasureString('A'.ToString()).Y,
+                             ancho, ancho, Color.Transparent);
+            btnSiglaAbajo2.SetImagen(trianguloAbajo);
+
+            btnSiglaAbajo3 = new Boton(graphics, spriteBatch,
+                         (int)puntoSiglas.X + anchoMenuSiglas - ancho - espacioMenuSiglas,
+                              (int)puntoSiglas.Y + espacioMenuSiglas * 2 + (int)fuenteSub.MeasureString(txtIntroduceSiglas).Y + ancho + (int)fuenteBotones.MeasureString('A'.ToString()).Y,
+                             ancho, ancho, Color.Transparent);
+            btnSiglaAbajo3.SetImagen(trianguloAbajo);
+
+            //boton enviar record
+            btnEnviarRecord = new Boton(graphics, spriteBatch,
+                (int)puntoSiglas.X,
+                (int)puntoSiglas.Y + altoMenuSiglas,
+                anchoMenuSiglas, ancho, Color.Green);
+            btnEnviarRecord.SetTexto(txtEnviar, fuenteBotones, Color.Black, true);
         }
 
 
@@ -817,6 +842,7 @@ namespace ProtectTheWorld
                     //acabaMusica();
                     //if (mejoraPuntuacion())
                     //{
+                    modo = "introduceSiglas";
                     //    pideSiglas = true;
                     //}
                     //else
@@ -943,12 +969,14 @@ namespace ProtectTheWorld
                 case "pausa":
                     DibujaPausa();
                     break;
+                case "introduceSiglas":
+                    DibujaIntroduceSiglas();
+                    break;
             }
             //dibujo los botones
             btnPausa.Dibuja();
             btnMusica.Dibuja();
 
-            //DibujaIntroduceSiglas();
             spriteBatch.End();
         }
         public void DibujaPausa()
@@ -975,7 +1003,28 @@ namespace ProtectTheWorld
             btnSiglaArriba2.Dibuja();
             btnSiglaArriba3.Dibuja();
             //siglas
+            spriteBatch.DrawString(fuenteBotones, siglas[0].ToString(),
+                new Vector2(puntoSiglas.X + espacioMenuSiglas + (AnchoPantalla / 25) / 2 - fuenteBotones.MeasureString(siglas[0].ToString()).X / 2,
+                puntoSiglas.Y + espacioMenuSiglas + fuenteSub.MeasureString(txtIntroduceSiglas).Y + AnchoPantalla / 25),
+                Color.Black);
 
+            spriteBatch.DrawString(fuenteBotones, siglas[1].ToString(),
+                new Vector2(AnchoPantalla / 2 - fuenteBotones.MeasureString(siglas[1].ToString()).X / 2,
+                puntoSiglas.Y + espacioMenuSiglas + fuenteSub.MeasureString(txtIntroduceSiglas).Y + AnchoPantalla / 25),
+                Color.Black);
+
+            spriteBatch.DrawString(fuenteBotones, siglas[2].ToString(),
+               new Vector2((int)puntoSiglas.X + anchoMenuSiglas - espacioMenuSiglas - fuenteBotones.MeasureString(siglas[2].ToString()).X / 2 - AnchoPantalla / 25 / 2,
+               puntoSiglas.Y + espacioMenuSiglas + fuenteSub.MeasureString(txtIntroduceSiglas).Y + AnchoPantalla / 25),
+               Color.Black);
+
+            //botones abajo
+            btnSiglaAbajo.Dibuja();
+            btnSiglaAbajo2.Dibuja();
+            btnSiglaAbajo3.Dibuja();
+
+            //boton enviar record
+            btnEnviarRecord.Dibuja();
         }
         public void DibujaGameplay()
         {
@@ -1001,6 +1050,35 @@ namespace ProtectTheWorld
             miNave.Dibujar();
         }
 
+        //PARA LAS SIGLAS
+        public char RetrocedeSigla(char letra)
+        {
+           int pos = abecedario.IndexOf(letra);
+            if (pos == 0)
+            {
+                pos = abecedario.Count - 1;
+            }
+            else
+            {
+                pos--;
+            }
+            letra = (char)abecedario[pos];
+            return letra;
+        }
+        public char AvanzaSigla(char letra)
+        {
+            int pos = abecedario.IndexOf(letra);
+            if (pos == abecedario.Count - 1)
+            {
+                pos = 0;
+            }
+            else
+            {
+                pos++;
+            }
+            letra = (char)abecedario[pos];
+            return letra;
+        }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL JUEGO
         public void GestionaJuego()
         {
@@ -1031,7 +1109,8 @@ namespace ProtectTheWorld
                 case "pausa":
                     GestionaBotonesJuego();
                     break;
-                case "hacerInsert":
+                case "introduceSiglas":
+                    GestionaBotonesJuego();
                     break;
             }
             //TECLADO
@@ -1064,6 +1143,30 @@ namespace ProtectTheWorld
                             if (ClickIzq(btnSalir))
                                 btnSalir.SetBandera(true);
                         }
+                        if (modo == "introduceSiglas")
+                        {
+                            if (ClickIzq(btnEnviarRecord))
+                                btnEnviarRecord.SetBandera(true);
+
+                            if (ClickIzq(btnSiglaArriba))
+                                btnSiglaArriba.SetBandera(true);
+
+                            if (ClickIzq(btnSiglaArriba2))
+                                btnSiglaArriba2.SetBandera(true);
+
+                            if (ClickIzq(btnSiglaArriba3))
+                                btnSiglaArriba3.SetBandera(true);
+
+                            if (ClickIzq(btnSiglaAbajo))
+                                btnSiglaAbajo.SetBandera(true);
+
+                            if (ClickIzq(btnSiglaAbajo2))
+                                btnSiglaAbajo2.SetBandera(true);
+
+                            if (ClickIzq(btnSiglaAbajo3))
+                                btnSiglaAbajo3.SetBandera(true);
+                        }
+
                         break;
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
@@ -1102,11 +1205,43 @@ namespace ProtectTheWorld
                             }
                             boolMusica = !boolMusica;
                         }
+                        if (LevantoIzq(btnEnviarRecord))
+                        {
+                            //guardo el record
+
+                            //vuelvo al menu principal
+                            estadoActualJuego = EstadoJuego.Menu;
+                        }
+                        if (LevantoIzq(btnSiglaArriba))
+                            siglas[0] = RetrocedeSigla(siglas[0]);
+
+                        if (LevantoIzq(btnSiglaArriba2))
+                            siglas[1] = RetrocedeSigla(siglas[1]);
+
+                        if (LevantoIzq(btnSiglaArriba3))
+                            siglas[2] = RetrocedeSigla(siglas[2]);
+
+                        if (LevantoIzq(btnSiglaAbajo))
+                            siglas[0] = AvanzaSigla(siglas[0]);
+
+                        if (LevantoIzq(btnSiglaAbajo2))
+                            siglas[1] = AvanzaSigla(siglas[1]);
+
+                        if (LevantoIzq(btnSiglaAbajo3))
+                            siglas[2] = AvanzaSigla(siglas[2]);
+
                         //pongo a false las banderas de todos los botones del menu opciones
                         btnPausa.SetBandera(false);
                         btnReanudar.SetBandera(false);
                         btnSalir.SetBandera(false);
                         btnMusica.SetBandera(false);
+                        btnEnviarRecord.SetBandera(false);
+                        btnSiglaAbajo.SetBandera(false);
+                        btnSiglaAbajo2.SetBandera(false);
+                        btnSiglaAbajo3.SetBandera(false);
+                        btnSiglaArriba.SetBandera(false);
+                        btnSiglaArriba2.SetBandera(false);
+                        btnSiglaArriba3.SetBandera(false);
                         break;
                 }
             }
