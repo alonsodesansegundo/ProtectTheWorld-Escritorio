@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,6 +39,7 @@ namespace ProtectTheWorld
         private List<Boton> botonesMenu;
         private Texture2D fondoMenu;
         private Boton btnJugar, btnOpciones, btnAyuda, btnRecords, btnCreditos;
+        private Song cancionMenu;
 
         //**********************JUEGO**********************
         private string modo, preguntaPausa, txtReanudar, txtSalir;
@@ -60,6 +62,7 @@ namespace ProtectTheWorld
         private Texture2D rectanguloPausa;
         private Color[] dataPausa;
         private Vector2 puntoPausa;
+        private Song cancionJuego;
 
         //menu introduce tus siglas
         private Texture2D rectanguloSiglas;
@@ -71,6 +74,8 @@ namespace ProtectTheWorld
         private Texture2D trianguloArriba, trianguloAbajo;
         private ArrayList abecedario;
         private char[] siglas;
+
+        private Song cancionSubmenu;
         //**********************OPCIONES**********************
         private Boton btnVolverMenu, btnNave1, btnNave2, btnNave3, btnMusicaSi, btnMusicaNo;
         private string txtSeleccionaNave, txtMusica, txtSi, txtNo;
@@ -143,6 +148,9 @@ namespace ProtectTheWorld
 
             //TODAS LAS IMAGENES
             CargarImagenes();
+
+            //TODOS LOS SONIDOS 
+            CargarAudio();
 
             //CARGO LOS DATOS DEL MENU
             CargarMenu();
@@ -277,11 +285,22 @@ namespace ProtectTheWorld
             trianguloArriba = Content.Load<Texture2D>("trianguloup");
         }
 
+        //*****************************************************************CANCIONES*****************************************************************
+        public void CargarAudio()
+        {
+            cancionMenu = Content.Load<Song>("musicamenu");
+            cancionJuego = Content.Load<Song>("game");
+            cancionSubmenu = Content.Load<Song>("submenus");
+        }
+
         //*****************************************************************MENU*****************************************************************
         public void CargarMenu()
         {
             CargarTextosMenu();
             CrearBotonesMenu();
+            MediaPlayer.IsRepeating = true;
+            if (boolMusica)
+                SuenaCancion(cancionMenu);
         }
         public void CargarTextosMenu()
         {
@@ -413,16 +432,36 @@ namespace ProtectTheWorld
                         {
                             estadoActualJuego = EstadoJuego.Gameplay;
                             InicializaVariablesJuego();
+                            //pongo la musica del juego
+                            if(boolMusica)
+                            SuenaCancion(cancionJuego);
                         }
                         //titulo = "FUNCIONA";
                         if (LevantoIzq(btnOpciones))
+                        {
                             estadoActualJuego = EstadoJuego.Opciones;
+                            //pongo la musica del submenu
+                            if (boolMusica)
+                                SuenaCancion(cancionSubmenu);
+                        }
                         if (LevantoIzq(btnAyuda))
+                        {
                             estadoActualJuego = EstadoJuego.Ayuda;
+                            if (boolMusica)
+                                SuenaCancion(cancionSubmenu);
+                        }
                         if (LevantoIzq(btnRecords))
+                        {
                             estadoActualJuego = EstadoJuego.Records;
+                            if (boolMusica)
+                                SuenaCancion(cancionSubmenu);
+                        }
                         if (LevantoIzq(btnCreditos))
+                        {
                             estadoActualJuego = EstadoJuego.Creditos;
+                            if (boolMusica)
+                                SuenaCancion(cancionSubmenu);
+                        }
 
                         //pongo a false las banderas de todos los botones del menu
                         foreach (Boton btn in botonesMenu)
@@ -448,7 +487,7 @@ namespace ProtectTheWorld
             siglas[0] = 'A';
             siglas[1] = 'A';
             siglas[2] = 'A';
-            if (boolMusica)
+            if (!boolMusica)
             {
                 btnMusica.SetImagen(imgMusicaOn);
             }
@@ -843,6 +882,7 @@ namespace ProtectTheWorld
                     //if (mejoraPuntuacion())
                     //{
                     modo = "introduceSiglas";
+                    ParaMusica();
                     //    pideSiglas = true;
                     //}
                     //else
@@ -1176,10 +1216,12 @@ namespace ProtectTheWorld
                             {
                                 case "jugando":
                                     modo = "pausa";
+                                    ParaMusica();
                                     btnPausa.SetImagen(imgBtnPlay);
                                     break;
                                 case "pausa":
                                     btnPausa.SetImagen(imgBtnPausa);
+                                    SuenaCancion(cancionJuego);
                                     modo = "jugando";
                                     break;
                             }
@@ -1187,21 +1229,28 @@ namespace ProtectTheWorld
                         if (LevantoIzq(btnReanudar))
                         {
                             btnPausa.SetImagen(imgBtnPausa);
+                            SuenaCancion(cancionJuego);
                             modo = "jugando";
                         }
 
                         if (LevantoIzq(btnSalir))
+                        {
                             estadoActualJuego = EstadoJuego.Menu;
+                            if (boolMusica)
+                                SuenaCancion(cancionMenu);
+                        }
 
                         if (LevantoIzq(btnMusica))
                         {
                             if (boolMusica)
                             {
-                                btnMusica.SetImagen(imgMusicaOff);
+                                btnMusica.SetImagen(imgMusicaOn);
+                                ParaMusica();
                             }
                             else
                             {
-                                btnMusica.SetImagen(imgMusicaOn);
+                                btnMusica.SetImagen(imgMusicaOff);
+                                SuenaCancion(cancionJuego);
                             }
                             boolMusica = !boolMusica;
                         }
@@ -1211,6 +1260,8 @@ namespace ProtectTheWorld
 
                             //vuelvo al menu principal
                             estadoActualJuego = EstadoJuego.Menu;
+                            if (boolMusica)
+                                SuenaCancion(cancionMenu);
                         }
                         if (LevantoIzq(btnSiglaArriba))
                             siglas[0] = RetrocedeSigla(siglas[0]);
@@ -1293,7 +1344,11 @@ namespace ProtectTheWorld
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
                         if (LevantoIzq(btnSalir))
+                        {
                             estadoActualJuego = EstadoJuego.Menu;
+                            if (boolMusica)
+                                SuenaCancion(cancionMenu);
+                        }
 
                         //pongo a false las banderas de todos los botones del menu opciones
                         btnSalir.SetBandera(false);
@@ -1437,7 +1492,11 @@ namespace ProtectTheWorld
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
                         if (LevantoIzq(btnVolverMenu))
+                        {
                             estadoActualJuego = EstadoJuego.Menu;
+                            if (boolMusica)
+                                SuenaCancion(cancionMenu);
+                        }
 
                         if (LevantoIzq(btnNave1) || LevantoIzq(btnNave2) || LevantoIzq(btnNave3))
                             ElegirNave();
@@ -1485,12 +1544,14 @@ namespace ProtectTheWorld
         {
             if (ClickIzq(btnMusicaSi))
             {
+                SuenaCancion(cancionSubmenu);
                 boolMusica = true;
                 btnMusicaSi.SetColor(Color.Green);
                 btnMusicaNo.SetColor(Color.Red);
             }
             if (ClickIzq(btnMusicaNo))
             {
+                ParaMusica();
                 boolMusica = false;
                 btnMusicaNo.SetColor(Color.Green);
                 btnMusicaSi.SetColor(Color.Red);
@@ -1696,6 +1757,8 @@ namespace ProtectTheWorld
                             if (modoAyuda == "principal")
                             {
                                 estadoActualJuego = EstadoJuego.Menu;
+                                if (boolMusica)
+                                    SuenaCancion(cancionMenu);
                             }
                             else
                             {
@@ -1764,7 +1827,11 @@ namespace ProtectTheWorld
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
                         if (LevantoIzq(btnVolverMenu))
+                        {
                             estadoActualJuego = EstadoJuego.Menu;
+                            if (boolMusica)
+                                SuenaCancion(cancionMenu);
+                        }
 
                         //pongo a false las banderas de todos los botones del menu opciones
                         btnVolverMenu.SetBandera(false);
@@ -1823,7 +1890,11 @@ namespace ProtectTheWorld
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
                         if (LevantoIzq(btnVolverMenu))
+                        {
                             estadoActualJuego = EstadoJuego.Menu;
+                            if (boolMusica)
+                                SuenaCancion(cancionMenu);
+                        }
 
                         //pongo a false las banderas de todos los botones del menu opciones
                         btnVolverMenu.SetBandera(false);
@@ -1849,8 +1920,14 @@ namespace ProtectTheWorld
             return false;
         }
 
-        public void TeclaPulsada()
+        //PARA LA MUSICA
+        public void SuenaCancion(Song futura)
         {
+            MediaPlayer.Play(futura);
+        }
+        public void ParaMusica()
+        {
+            MediaPlayer.Pause();
         }
     }
 }

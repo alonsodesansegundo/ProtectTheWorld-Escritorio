@@ -286,3 +286,21 @@
 /processorParam:TextureFormat=Color
 /build:nave3.png
 
+#begin game.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:game.mp3
+
+#begin submenus.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:submenus.mp3
+
+#begin musicamenu.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:musicamenu.mp3
+
