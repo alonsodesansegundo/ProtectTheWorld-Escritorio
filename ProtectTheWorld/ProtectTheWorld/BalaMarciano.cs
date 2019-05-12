@@ -41,6 +41,7 @@ namespace ProtectTheWorld
         public void Dibuja()
         {
             spriteBatch.Draw(this.img, this.contenedor, Color.White);
+            
         }
     }
 }

@@ -89,8 +89,7 @@ namespace ProtectTheWorld
         private string[] infoFinalidad, infoNave, infoNiveles, infoMarcianos;
 
         //**********************RECORDS**********************
-        private string a;
-
+        private List<string> puntuaciones;
         //**********************CREDITOS**********************
         private string txtFuente, txtImagenes, txtImg, txtImg2, txtMusic, txtHecho;
         //**********************CONSTRUCTOR**********************
@@ -138,10 +137,38 @@ namespace ProtectTheWorld
             AltoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Height;
             AnchoPantalla = (int)ApplicationView.GetForCurrentView().VisibleBounds.Width;
 
+
+            //BASE DE DATOS
+            DataAccessLibrary.DataAcess.InitializeDatabase();
+
             //NAVE CON LA QUE VOY A JUGAR
-            numNave = 1;
-            //MUSICA SI O NO
-            boolMusica = true;
+            List<String> op = DataAccessLibrary.DataAcess.DameDato("SELECT Nave,Musica FROM OPCIONES");
+            int aux1 = Convert.ToInt32(op[0]);
+            switch (aux1)
+            {
+                case 3:
+                    numNave = 3;
+                    break;
+                case 1:
+                    numNave = 1;
+                    break;
+                case 2:
+                    numNave = 2;
+                    break;
+            }
+
+            ////MUSICA SI O NO
+            int aux2 = Convert.ToInt32(op[1]);
+            if (aux2 == 1)
+            {
+                boolMusica = true;
+            }
+            else
+            {
+                boolMusica = false;
+            }
+
+
 
             //TODAS LAS FUENTES
             CargarFuentes();
@@ -1240,6 +1267,16 @@ namespace ProtectTheWorld
                                 SuenaCancion(cancionJuego);
                             }
                             boolMusica = !boolMusica;
+                            if (boolMusica)
+                            {
+                                //actualizo a un uno
+                                DataAccessLibrary.DataAcess.EjecutaQuery("UPDATE OPCIONES SET Musica= ('1')");
+                            }
+                            else
+                            {
+                                //actualizo un 0
+                                DataAccessLibrary.DataAcess.EjecutaQuery("UPDATE OPCIONES SET Musica = ('0')");
+                            }
                         }
                         if (LevantoIzq(btnEnviarRecord))
                         {
@@ -1510,7 +1547,6 @@ namespace ProtectTheWorld
                 btnNave1.SetColor(Color.Green);
                 btnNave2.SetColor(Color.Red);
                 btnNave3.SetColor(Color.Red);
-
             }
             if (ClickIzq(btnNave2))
             {
@@ -1526,6 +1562,8 @@ namespace ProtectTheWorld
                 btnNave2.SetColor(Color.Red);
                 btnNave3.SetColor(Color.Green);
             }
+            DataAccessLibrary.DataAcess.EjecutaQuery("UPDATE OPCIONES SET Nave = ('" + numNave + "')");
+
         }
         public void ElegirMusica()
         {
@@ -1781,9 +1819,10 @@ namespace ProtectTheWorld
         }
 
         //*****************************************************************RECORDS*****************************************************************
+      
         public void CargarRecords()
         {
-
+            puntuaciones = DataAccessLibrary.DataAcess.DameRecords();
         }
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ RÉCORDS
         public void DibujaRecords()
@@ -1792,6 +1831,8 @@ namespace ProtectTheWorld
             spriteBatch.Begin();
             spriteBatch.DrawString(fuenteTitulo, txtRecords, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
             btnVolverMenu.Dibuja();
+            spriteBatch.DrawString(fuenteTitulo, puntuaciones[1], new Vector2(AnchoPantalla / 2 , AltoPantalla / 2), Color.White);
+
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ RÉCORDS
