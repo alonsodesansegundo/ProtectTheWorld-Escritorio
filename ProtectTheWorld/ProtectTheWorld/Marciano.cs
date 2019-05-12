@@ -77,7 +77,7 @@ namespace ProtectTheWorld
 
         public bool limiteAbajo(int limiteY)
         {
-            if (this.contenedor.Y + this.imagen.Height > limiteY)
+            if (this.contenedor.Y +this.alto> limiteY)
                 return true;
             return false;
         }

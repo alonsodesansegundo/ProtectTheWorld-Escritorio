@@ -433,8 +433,8 @@ namespace ProtectTheWorld
                             estadoActualJuego = EstadoJuego.Gameplay;
                             InicializaVariablesJuego();
                             //pongo la musica del juego
-                            if(boolMusica)
-                            SuenaCancion(cancionJuego);
+                            if (boolMusica)
+                                SuenaCancion(cancionJuego);
                         }
                         //titulo = "FUNCIONA";
                         if (LevantoIzq(btnOpciones))
@@ -670,45 +670,27 @@ namespace ProtectTheWorld
                 anchoMenuSiglas, ancho, Color.Green);
             btnEnviarRecord.SetTexto(txtEnviar, fuenteBotones, Color.Black, true);
         }
-
-
+        
         //------------------------GESTION TECLADO JUEGO------------------------
         public void gestionaTeclado()
         {
             //TECLADO
             teclado = Keyboard.GetState();
-            //CONFIGURACION FLECHAS
-            //SI PULSA FLECHA ABAJO
-            //if (teclado.IsKeyDown(Keys.Down))
-            //    estoyJugando = false;
 
             if (modo == "jugando")
             {
                 //SI PULSA LA FLECHA DRCH
                 if (teclado.IsKeyDown(Keys.Right))
-                    miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+                        miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+                
                 //SI PULSA LA FLECHA IZQ
                 if (teclado.IsKeyDown(Keys.Left))
                     miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
+
                 //SI PULSA EL ESPACIO
-                if (teclado.IsKeyDown(Keys.Space))
+                if (teclado.IsKeyDown(Keys.Space) && !miNave.getHayBala())
                     miNave.disparar();
             }
-
-
-            //CONFIGURACION ALTERNATIVA
-            //SI PULSA W
-            //if (teclado.IsKeyDown(Keys.S))
-            //    estadoActualJuego = EstadoJuego.Menu;
-            ////SI PULSA LA D
-            //if (teclado.IsKeyDown(Keys.D))
-            //    miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
-            ////SI PULSA LA A
-            //if (teclado.IsKeyDown(Keys.A))
-            //    miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
-            ////SI PULSA FLECHA ARRIBA
-            //if (teclado.IsKeyDown(Keys.W))
-            //    miNave.disparar();
         }
         //------------------------RELLENA EL ARRAY DE MARCIANOS------------------------
         public void rellenaMarcianos()
@@ -976,8 +958,13 @@ namespace ProtectTheWorld
                         marcianos[i, j].moverLateral(voyIzquierda);
                         //en caso de tener que descender un nivel, lo hace
                         marcianos[i, j].moverAbajo(voyAbajo);
-                        if (marcianos[i, j].limiteAbajo(AltoPantalla - miNave.getAlto()))
+                        //if (marcianos[i, j].limiteAbajo(AltoPantalla - miNave.getAlto()))
+                        if(marcianos[i,j].getContenedor().Intersects(miNave.getContenedor()))
                         {
+                            
+                            modo = "perdi";
+                            miNave.setImagen(explosion);
+                            ParaMusica();
                             //if (mejoraPuntuacion())
                             //{
                             //    pideSiglas = true;
@@ -1093,7 +1080,7 @@ namespace ProtectTheWorld
         //PARA LAS SIGLAS
         public char RetrocedeSigla(char letra)
         {
-           int pos = abecedario.IndexOf(letra);
+            int pos = abecedario.IndexOf(letra);
             if (pos == 0)
             {
                 pos = abecedario.Count - 1;
@@ -1127,7 +1114,7 @@ namespace ProtectTheWorld
                 case "jugando":
                     auxiliar++;
                     //BALAS MARCIANOS
-                    if (auxiliar == 100)
+                    if (auxiliar == 200)
                     {
                         auxiliar = 0;
                         disparanMarcianos();
