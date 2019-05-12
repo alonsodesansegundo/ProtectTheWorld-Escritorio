@@ -52,3 +52,24 @@ Lunes 6 de Mayo
 
 Solucionado el setTexto de la clase botón, para que si se le pasa centrado a true, centre el texto respecto a los dos ejes.
 Menú definitivo pausa juego.
+
+Martes 7 de Mayo
+
+Colocacion y funcionalidad botones ayuda, falta que muestren el texto correcto.
+Ayuda finalidad.
+Submenus ayuda, faltan imagenes marcianos y sus puntuaciones.
+
+Jueves 9 de Mayo
+
+Restructura del código, creando los métodos cargarJuego, cargarOpciones...
+Creación de la pantalla opciones.
+Modificación de la pantalla ayuda (marcianos).
+Cambio imagen boton musica (en el juego) tras pulsacion
+
+Viernes 10 de Mayo
+
+Comienzo diseño menú introduce tus siglas.
+
+Sábado 11 de Mayo
+
+A falta de guardar el record y las siglas, está realizado el diseño y funcionalidad del menu introduce tus siglas.
