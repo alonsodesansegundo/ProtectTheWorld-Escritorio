@@ -142,7 +142,7 @@ namespace ProtectTheWorld
             DataAccessLibrary.DataAcess.InitializeDatabase();
 
             //NAVE CON LA QUE VOY A JUGAR
-            List<String> op = DataAccessLibrary.DataAcess.DameDato("SELECT Nave,Musica FROM OPCIONES");
+            List<String> op = DataAccessLibrary.DataAcess.DameOpciones();
             int aux1 = Convert.ToInt32(op[0]);
             switch (aux1)
             {
@@ -1573,6 +1573,7 @@ namespace ProtectTheWorld
                 boolMusica = true;
                 btnMusicaSi.SetColor(Color.Green);
                 btnMusicaNo.SetColor(Color.Red);
+                DataAccessLibrary.DataAcess.EjecutaQuery("UPDATE opciones SET Musica = ('1')");
             }
             if (ClickIzq(btnMusicaNo))
             {
@@ -1580,6 +1581,7 @@ namespace ProtectTheWorld
                 boolMusica = false;
                 btnMusicaNo.SetColor(Color.Green);
                 btnMusicaSi.SetColor(Color.Red);
+                DataAccessLibrary.DataAcess.EjecutaQuery("UPDATE opciones SET Musica = ('0')");
             }
         }
         //AYUDA
@@ -1831,7 +1833,7 @@ namespace ProtectTheWorld
             spriteBatch.Begin();
             spriteBatch.DrawString(fuenteTitulo, txtRecords, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
             btnVolverMenu.Dibuja();
-            spriteBatch.DrawString(fuenteTitulo, puntuaciones[1], new Vector2(AnchoPantalla / 2 , AltoPantalla / 2), Color.White);
+            spriteBatch.DrawString(fuenteTitulo,puntuaciones.Count.ToString(), new Vector2(AnchoPantalla / 2 , AltoPantalla / 2), Color.White);
 
             spriteBatch.End();
         }
