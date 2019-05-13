@@ -16,6 +16,7 @@ namespace DataAccessLibrary
                 new SqliteConnection("Filename=sqliteSample.db"))
             {
                 db.Open();
+                EjecutaQuery("DROP TABLE PUNTUACIONES");
                 String tablaOpciones = "CREATE TABLE IF NOT " +
                     "EXISTS OPCIONES (Nave INTEGER, " +
                     "Musica INTEGER)";
@@ -34,19 +35,19 @@ namespace DataAccessLibrary
 
                 //INSERTO DATOS EN ELLAS
                 //records iniciales
-                if (DameRecords().Count == 0)
+                if (DameSiglas().Count == 0 || DamePuntuaciones().Count == 0)
                 {
                     string insertRecords = "INSERT INTO PUNTUACIONES VALUES" +
-                            "(0,'???',0), " +
-                            "(1,'???',0), " +
-                            "(2,'???',0), " +
-                            "(3,'???',0), " +
-                            "(4,'???',0), " +
-                            "(5,'???',0), " +
-                            "(6,'???',0), " +
-                            "(7,'???',0), " +
-                            "(8,'???',0), " +
-                            "(9,'???',0) ";
+                            "(0,'???',10), " +
+                            "(1,'???',10), " +
+                            "(2,'???',10), " +
+                            "(3,'???',10), " +
+                            "(4,'???',10), " +
+                            "(5,'???',10), " +
+                            "(6,'???',10), " +
+                            "(7,'???',10), " +
+                            "(8,'???',10), " +
+                            "(9,'???',10) ";
                     EjecutaQuery(insertRecords);
                 }
                 if (DameOpciones().Count == 0)
@@ -78,31 +79,6 @@ namespace DataAccessLibrary
 
 
         }
-
-        //PARA OBTENER DATOS
-        public static List<String> DameDato(string consulta)
-        {
-            List<String> entries = new List<string>();
-
-            using (SqliteConnection db =
-                new SqliteConnection("Filename=sqliteSample.db"))
-            {
-                db.Open();
-
-                SqliteCommand selectCommand = new SqliteCommand
-                    (consulta, db);
-
-                SqliteDataReader query = selectCommand.ExecuteReader();
-
-                while (query.Read())
-                {
-                    entries.Add(query.GetString(0));
-                }
-
-                db.Close();
-            }
-            return entries;
-        }
         public static List<String> DameOpciones()
         {
             List<String> entries = new List<string>();
@@ -127,7 +103,7 @@ namespace DataAccessLibrary
             }
             return entries;
         }
-        public static List<String> DameRecords()
+        public static List<String> DamePuntuaciones()
         {
             List<String> entries = new List<string>();
 
@@ -137,14 +113,12 @@ namespace DataAccessLibrary
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ("SELECT Id,Siglas,Puntuacion FROM PUNTUACIONES", db);
+                    ("SELECT siglas,id,puntuacion FROM PUNTUACIONES ORDER BY 3 desc, 2 ", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
                 while (query.Read())
                 {
-                    entries.Add(query.GetString(0));
-                    entries.Add(query.GetString(1));
                     entries.Add(query.GetString(2));
                 }
 
@@ -152,5 +126,74 @@ namespace DataAccessLibrary
             }
             return entries;
         }
+        public static List<String> DameSiglas()
+        {
+            List<String> entries = new List<string>();
+
+            using (SqliteConnection db =
+                new SqliteConnection("Filename=sqliteSample.db"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ("SELECT siglas,id,puntuacion FROM PUNTUACIONES ORDER BY 3 desc, 2 ", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                while (query.Read())
+                {
+                    entries.Add(query.GetString(0));
+
+                }
+
+                db.Close();
+            }
+            return entries;
         }
+        public static List<String> PeorPuntuacion()
+        {
+            List<String> entries = new List<string>();
+
+            using (SqliteConnection db =
+                new SqliteConnection("Filename=sqliteSample.db"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ("SELECT id,siglas,puntuacion FROM PUNTUACIONES ORDER BY 3 , 1 DESC LIMIT 1", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                while (query.Read())
+                {
+                    entries.Add(query.GetString(0));
+                    entries.Add(query.GetString(2));
+                }
+                db.Close();
+            }
+            return entries;
+        }
+        public static int MaximoId()
+        {
+            int max = 0;
+            using (SqliteConnection db =
+                new SqliteConnection("Filename=sqliteSample.db"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ("SELECT max(id) FROM PUNTUACIONES", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                while (query.Read())
+                {
+                    max=query.GetInt32(0);
+                }
+                db.Close();
+            }
+            return max;
+        }
+    }
+
 }

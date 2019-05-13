@@ -65,6 +65,7 @@ namespace ProtectTheWorld
         private Song cancionJuego;
 
         //menu introduce tus siglas
+        private List<string> datos;
         private Texture2D rectanguloSiglas;
         private Color[] dataSiglas;
         private string txtIntroduceSiglas, txtEnviar;
@@ -89,7 +90,9 @@ namespace ProtectTheWorld
         private string[] infoFinalidad, infoNave, infoNiveles, infoMarcianos;
 
         //**********************RECORDS**********************
-        private List<string> puntuaciones;
+        private List<string> listaPuntuaciones, listaSiglas;
+        private Texture2D imgMedallaOro, imgMedallaPlata, imgMedallaBronce;
+        int anchoMedalla;
         //**********************CREDITOS**********************
         private string txtFuente, txtImagenes, txtImg, txtImg2, txtMusic, txtHecho;
         //**********************CONSTRUCTOR**********************
@@ -310,6 +313,9 @@ namespace ProtectTheWorld
             imgMusicaOn = Content.Load<Texture2D>("musica");
             trianguloAbajo = Content.Load<Texture2D>("triangulodown");
             trianguloArriba = Content.Load<Texture2D>("trianguloup");
+            imgMedallaOro = Content.Load<Texture2D>("oro");
+            imgMedallaPlata = Content.Load<Texture2D>("plata");
+            imgMedallaBronce = Content.Load<Texture2D>("bronce");
         }
 
         //*****************************************************************CANCIONES*****************************************************************
@@ -697,7 +703,7 @@ namespace ProtectTheWorld
                 anchoMenuSiglas, ancho, Color.Green);
             btnEnviarRecord.SetTexto(txtEnviar, fuenteBotones, Color.Black, true);
         }
-        
+
         //------------------------GESTION TECLADO JUEGO------------------------
         public void gestionaTeclado()
         {
@@ -708,8 +714,8 @@ namespace ProtectTheWorld
             {
                 //SI PULSA LA FLECHA DRCH
                 if (teclado.IsKeyDown(Keys.Right))
-                        miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
-                
+                    miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
+
                 //SI PULSA LA FLECHA IZQ
                 if (teclado.IsKeyDown(Keys.Left))
                     miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
@@ -885,20 +891,15 @@ namespace ProtectTheWorld
 
                     miNave.setImagen(explosion);
                     //perdi
-                    modo = "perdi";
-                    //mueveNave = false;
-                    //acabaMusica();
-                    //if (mejoraPuntuacion())
-                    //{
-                    modo = "introduceSiglas";
                     ParaMusica();
-                    //    pideSiglas = true;
-                    //}
-                    //else
-                    //{
-                    //    perdi = true;
-                    //}
-                    //perdi = true;
+                    if (mejoraPuntuacion())
+                    {
+                        modo = "introduceSiglas";
+                    }
+                    else
+                    {
+                        modo = "perdi";
+                    }
                 }
                 else
                 {
@@ -928,6 +929,15 @@ namespace ProtectTheWorld
 
                 }
             }
+        }
+        public bool mejoraPuntuacion()
+        {
+            datos = DataAccessLibrary.DataAcess.PeorPuntuacion();
+            if (puntuacionGlobal > Convert.ToInt32(datos[1]))
+            {
+                return true;
+            }
+            return false;
         }
         //------------------------MOVIMIENTO VERTICAL Y HORIZONTAL DE LOS MARCIANOS------------------------
         public void actualizaBanderasMovimiento()
@@ -986,9 +996,9 @@ namespace ProtectTheWorld
                         //en caso de tener que descender un nivel, lo hace
                         marcianos[i, j].moverAbajo(voyAbajo);
                         //if (marcianos[i, j].limiteAbajo(AltoPantalla - miNave.getAlto()))
-                        if(marcianos[i,j].getContenedor().Intersects(miNave.getContenedor()))
+                        if (marcianos[i, j].getContenedor().Intersects(miNave.getContenedor()))
                         {
-                            
+
                             modo = "perdi";
                             miNave.setImagen(explosion);
                             ParaMusica();
@@ -1281,7 +1291,7 @@ namespace ProtectTheWorld
                         if (LevantoIzq(btnEnviarRecord))
                         {
                             //guardo el record
-
+                            GuardarRecord();
                             //vuelvo al menu principal
                             estadoActualJuego = EstadoJuego.Menu;
                             if (boolMusica)
@@ -1320,6 +1330,14 @@ namespace ProtectTheWorld
                         break;
                 }
             }
+        }
+        public void GuardarRecord()
+        {
+            DataAccessLibrary.DataAcess.EjecutaQuery("DELETE FROM puntuaciones WHERE ID=" + datos[0]);
+            int m =DataAccessLibrary.DataAcess.MaximoId();
+            m+=1;
+            DataAccessLibrary.DataAcess.EjecutaQuery("INSERT INTO PUNTUACIONES(id,siglas,puntuacion) VALUES ("+m+",'"+siglas[0] + siglas[1] + siglas[2]+"',"+puntuacionGlobal+")");
+            CargarRecords();
         }
         public void PulsaReanudar()
         {
@@ -1821,20 +1839,81 @@ namespace ProtectTheWorld
         }
 
         //*****************************************************************RECORDS*****************************************************************
-      
+
         public void CargarRecords()
         {
-            puntuaciones = DataAccessLibrary.DataAcess.DameRecords();
+            listaPuntuaciones = DataAccessLibrary.DataAcess.DamePuntuaciones();
+            listaSiglas = DataAccessLibrary.DataAcess.DameSiglas();
         }
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ RÉCORDS
         public void DibujaRecords()
         {
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            spriteBatch.DrawString(fuenteTitulo, txtRecords, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
+            spriteBatch.DrawString(fuenteTitulo, txtRecords, new Vector2(AnchoPantalla / 2 - (int)fuenteTitulo.MeasureString(txtRecords).X / 2, AltoPantalla / 20), Color.White);
             btnVolverMenu.Dibuja();
-            spriteBatch.DrawString(fuenteTitulo,puntuaciones.Count.ToString(), new Vector2(AnchoPantalla / 2 , AltoPantalla / 2), Color.White);
+            //dibujo los records
+            int posY = AltoPantalla / 4;
+            int ancho = (int)fuenteBotones.MeasureString("A").Y;
+            int espacio = (int)fuenteBotones.MeasureString("A").Y + 10;
+            for (int i = 0; i < listaPuntuaciones.Count; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        spriteBatch.Draw(this.imgMedallaOro,
+                            new Rectangle((int)AnchoPantalla / 2 - (int)fuenteBotones.MeasureString("10.- " + listaSiglas[i] + " " + listaPuntuaciones[i]).X / 2,
+                            posY,
+                            ancho,
+                            ancho),
+                            Color.White);
+                        spriteBatch.DrawString(fuenteBotones,
+                            " " + listaSiglas[i] + " " + listaPuntuaciones[i],
+                            new Vector2((int)AnchoPantalla / 2 - (int)fuenteBotones.MeasureString(" " + listaSiglas[i] + " " + listaPuntuaciones[i]).X / 2,
+                            posY),
+                            Color.White);
 
+                        break;
+                    case 1:
+                        spriteBatch.Draw(this.imgMedallaPlata,
+                        new Rectangle((int)AnchoPantalla / 2 - (int)fuenteBotones.MeasureString("10.- " + listaSiglas[i] + " " + listaPuntuaciones[i]).X / 2,
+                        posY,
+                        ancho,
+                        ancho),
+                        Color.White);
+                        spriteBatch.DrawString(fuenteBotones,
+                            " " + listaSiglas[i] + " " + listaPuntuaciones[i],
+                            new Vector2((int)AnchoPantalla / 2 - (int)fuenteBotones.MeasureString(" " + listaSiglas[i] + " " + listaPuntuaciones[i]).X / 2,
+                            posY),
+                            Color.White);
+                        break;
+                    case 2:
+                        spriteBatch.Draw(this.imgMedallaBronce,
+                       new Rectangle((int)AnchoPantalla / 2 - (int)fuenteBotones.MeasureString("10.- " + listaSiglas[i] + " " + listaPuntuaciones[i]).X / 2,
+                       posY,
+                       ancho,
+                       ancho),
+                       Color.White);
+                        spriteBatch.DrawString(fuenteBotones,
+                            " " + listaSiglas[i] + " " + listaPuntuaciones[i],
+                            new Vector2((int)AnchoPantalla / 2 - (int)fuenteBotones.MeasureString(" " + listaSiglas[i] + " " + listaPuntuaciones[i]).X / 2,
+                            posY),
+                            Color.White);
+                        break;
+                        break;
+                    default:
+                        spriteBatch.DrawString(fuenteBotones,
+                             i + 1 + ".- " + listaSiglas[i] + " " + listaPuntuaciones[i],
+                            new Vector2((int)AnchoPantalla / 2 - (int)fuenteBotones.MeasureString("10.- " + listaSiglas[i] + " " + listaPuntuaciones[i]).X / 2,
+                            posY),
+                            Color.White);
+                        break;
+                }
+                //espacio entre records
+                posY += espacio;
+            }
+            //vuelvo a la posY inicial
+            posY = AltoPantalla / 4;
             spriteBatch.End();
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ RÉCORDS
