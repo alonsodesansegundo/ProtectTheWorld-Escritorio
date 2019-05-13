@@ -42,7 +42,7 @@ namespace ProtectTheWorld
         private Song cancionMenu;
 
         //**********************JUEGO**********************
-        private string modo, preguntaPausa, txtReanudar, txtSalir;
+        private string modo, preguntaPausa,preguntaRepetir, txtReanudar, txtSalir;
         private int filas, columnas, nivel, primeraX, primeraY, altoMarciano, anchoMarciano,
             altoProyectilNave, anchoProyectilNave, altoNave, anchoNave, vNave, probabilidadDisparoMarcianos, aleatorio,
             puntuacionGlobal, auxiliar, anchoProyectilMarciano, altoProyectilMarciano, vBalaMarciano;
@@ -51,7 +51,7 @@ namespace ProtectTheWorld
         private Marciano[,] marcianos;
         private ArrayList misColumnas;
         private List<BalaMarciano> balasMarcianos;
-        private Boton btnPausa, btnReanudar, btnSalir, btnMusica;
+        private Boton btnPausa, btnReanudar, btnSalir,btnRepetirSi,btnRepetirNo, btnMusica;
         private Texture2D imgMarciano1, imgMarciano2, imgNave1, imgNave2, imgNave3, imgBala, imgBalaMarciano, explosion, imgBtnPausa, imgBtnPlay, imgMusicaOn, imgMusicaOff;
         private Nave miNave;
         private bool voyIzquierda, voyAbajo;
@@ -610,7 +610,10 @@ namespace ProtectTheWorld
 
         public void CargarTextosJuego()
         {
+            txtSi = "Si";
+            txtNo = "No";
             preguntaPausa = "Que deseas hacer?";
+            preguntaRepetir = "Otra partida?";
             txtReanudar = "Reanudar";
             txtSalir = "Salir";
             txtIntroduceSiglas = "Introduce tus siglas";
@@ -643,6 +646,14 @@ namespace ProtectTheWorld
                 Color.Green);
             btnReanudar.SetTexto(txtReanudar, fuenteBotones, Color.Black, true);
 
+            btnRepetirSi = new Boton(graphics, spriteBatch,
+                (int)punto.X + espacioMenuPausa,
+                AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtReanudar).Y,
+                anchoMenuPausa / 2 - espacioMenuPausa * 2,
+                (int)fuenteBotones.MeasureString(txtReanudar).Y * 2,
+                Color.Green);
+            btnRepetirSi.SetTexto(txtSi, fuenteBotones, Color.Black, true);
+
             btnSalir = new Boton(graphics, spriteBatch,
                 AnchoPantalla / 2 + espacioMenuPausa,
                 AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtSalir).Y,
@@ -650,6 +661,14 @@ namespace ProtectTheWorld
                 (int)fuenteBotones.MeasureString(txtReanudar).Y * 2,
                 Color.Red);
             btnSalir.SetTexto(txtSalir, fuenteBotones, Color.Black, true);
+
+            btnRepetirNo= new Boton(graphics, spriteBatch,
+                AnchoPantalla / 2 + espacioMenuPausa,
+                AltoPantalla / 2 - (int)fuenteBotones.MeasureString(txtSalir).Y,
+                anchoMenuPausa / 2 - espacioMenuPausa * 2,
+                (int)fuenteBotones.MeasureString(txtReanudar).Y * 2,
+                Color.Red);
+            btnRepetirNo.SetTexto(txtNo, fuenteBotones, Color.Black, true);
 
             //introduce tus siglas
             espacioMenuSiglas = 20;
@@ -1036,12 +1055,28 @@ namespace ProtectTheWorld
                 case "introduceSiglas":
                     DibujaIntroduceSiglas();
                     break;
+                case "perdi":
+                    DibujaRepetir();
+                    break;
             }
             //dibujo los botones
             btnPausa.Dibuja();
             btnMusica.Dibuja();
 
             spriteBatch.End();
+        }
+        public void DibujaRepetir()
+        {
+
+            //dibujo el rectangulo
+            spriteBatch.Draw(rectanguloPausa, puntoPausa, Color.White);
+
+            //dibujo la pregunta
+            spriteBatch.DrawString(fuenteSub, preguntaRepetir, new Vector2(AnchoPantalla/2- fuenteSub.MeasureString(preguntaRepetir).X/2, puntoPausa.Y), Color.Black);
+
+            //botones
+            btnRepetirSi.Dibuja();
+            btnRepetirNo.Dibuja();
         }
         public void DibujaPausa()
         {
@@ -1176,6 +1211,9 @@ namespace ProtectTheWorld
                 case "introduceSiglas":
                     GestionaBotonesJuego();
                     break;
+                case "perdi":
+                    GestionaBotonesJuego();
+                    break;
             }
             //TECLADO
             gestionaTeclado();
@@ -1206,6 +1244,14 @@ namespace ProtectTheWorld
 
                             if (ClickIzq(btnSalir))
                                 btnSalir.SetBandera(true);
+                        }
+                        if (modo == "perdi")
+                        {
+                            if (ClickIzq(btnRepetirNo))
+                            btnRepetirNo.SetBandera(true);
+
+                            if (ClickIzq(btnRepetirSi))
+                                btnRepetirSi.SetBandera(true);
                         }
                         if (modo == "introduceSiglas")
                         {
@@ -1264,6 +1310,18 @@ namespace ProtectTheWorld
                                 SuenaCancion(cancionMenu);
                         }
 
+                        if (LevantoIzq(btnRepetirNo))
+                        {
+                            estadoActualJuego = EstadoJuego.Menu;
+                            if (boolMusica)
+                                SuenaCancion(cancionMenu);
+                        }
+                        if (LevantoIzq(btnRepetirSi))
+                        {
+                            InicializaVariablesJuego();
+                            if (boolMusica)
+                                SuenaCancion(cancionJuego);
+                        }
                         if (LevantoIzq(btnMusica))
                         {
                             if (boolMusica)
@@ -1292,10 +1350,8 @@ namespace ProtectTheWorld
                         {
                             //guardo el record
                             GuardarRecord();
-                            //vuelvo al menu principal
-                            estadoActualJuego = EstadoJuego.Menu;
-                            if (boolMusica)
-                                SuenaCancion(cancionMenu);
+                            //para preguntar si desea volver a jugar o no
+                            modo = "perdi";
                         }
                         if (LevantoIzq(btnSiglaArriba))
                             siglas[0] = RetrocedeSigla(siglas[0]);
@@ -1327,6 +1383,8 @@ namespace ProtectTheWorld
                         btnSiglaArriba.SetBandera(false);
                         btnSiglaArriba2.SetBandera(false);
                         btnSiglaArriba3.SetBandera(false);
+                        btnRepetirSi.SetBandera(false);
+                        btnRepetirNo.SetBandera(false);
                         break;
                 }
             }
