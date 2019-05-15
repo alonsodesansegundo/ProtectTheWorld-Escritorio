@@ -109,6 +109,7 @@ namespace ProtectTheWorld
         /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
+
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -117,7 +118,8 @@ namespace ProtectTheWorld
 
             //PANTALLA COMPLETA
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
-
+            
+            
             //INICIALIZO LA PRIMERA PANTALLA
             estadoActualJuego = EstadoJuego.Menu;
 
