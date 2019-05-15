@@ -16,7 +16,7 @@ namespace DataAccessLibrary
                 new SqliteConnection("Filename=sqliteSample.db"))
             {
                 db.Open();
-                EjecutaQuery("DROP TABLE PUNTUACIONES");
+                //EjecutaQuery("DROP TABLE PUNTUACIONES");
                 String tablaOpciones = "CREATE TABLE IF NOT " +
                     "EXISTS OPCIONES (Nave INTEGER, " +
                     "Musica INTEGER)";
@@ -34,6 +34,14 @@ namespace DataAccessLibrary
                 creaTablaRecords.ExecuteReader();
 
                 //INSERTO DATOS EN ELLAS
+                
+                if (DameOpciones().Count == 0)
+                {
+                    //opciones iniciales
+                    string insertOpciones = "INSERT INTO OPCIONES VALUES" +
+                        "(1,1)";
+                    EjecutaQuery(insertOpciones);
+                }
                 //records iniciales
                 if (DameSiglas().Count == 0 || DamePuntuaciones().Count == 0)
                 {
@@ -49,13 +57,6 @@ namespace DataAccessLibrary
                             "(8,'???',10), " +
                             "(9,'???',10) ";
                     EjecutaQuery(insertRecords);
-                }
-                if (DameOpciones().Count == 0)
-                {
-                    //opciones iniciales
-                    string insertOpciones = "INSERT INTO OPCIONES VALUES" +
-                        "(1,1)";
-                    EjecutaQuery(insertOpciones);
                 }
             }
         }
