@@ -94,7 +94,10 @@ namespace ProtectTheWorld
         private Texture2D imgMedallaOro, imgMedallaPlata, imgMedallaBronce;
         int anchoMedalla;
         //**********************CREDITOS**********************
-        private string txtFuente, txtImagenes, txtImg, txtImg2, txtMusic, txtHecho;
+        private string txtFuente, txtImagenes, txtImg, txtImg2, txtMusic, txtHecho,txtYoutube,txtCanal;
+        private bool moverCreditos;
+        private int posCreditos;
+        private int modoCreditos;
         //**********************CONSTRUCTOR**********************
         public Manejador()
         {
@@ -2014,34 +2017,100 @@ namespace ProtectTheWorld
         //*****************************************************************CRÉDITOS*****************************************************************
         public void CargarCreditos()
         {
+            modoCreditos = 0;
+            moverCreditos = true;
+            posCreditos = AltoPantalla / 20+(int)fuenteTitulo.MeasureString(txtCreditos).Y;
             CargarTextosCreditos();
         }
         public void CargarTextosCreditos()
         {
-
-            txtFuente = "Fuente";
+            //txtFuente = "Fuente";
             txtImagenes = "Imagenes";
             txtImg = "https://game-icons.net";
             txtImg2 = "https://pixabay.com";
             txtMusic = "https://patrickdearteaga.com/ ";
             //txtFont = contexto.getString(R.string.font1);
             txtHecho = "Realizado y dirigido por";
-            //txtAyuda = contexto.getString(R.string.conAyuda);
-            //txtYotube = contexto.getString(R.string.youtube);
-            //txtCanal = contexto.getString(R.string.canalYT);
+            txtYoutube = "https://www.youtube.com/";
+            txtCanal = "Canal: Free Music for Commercial Use";
         }
         //MÉTODO ENCARGADO DE DIBUJAR EL MENÚ CRÉDITOS
         public void DibujaCreditos()
         {
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-            spriteBatch.DrawString(fuenteTitulo, txtCreditos, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
+            spriteBatch.DrawString(fuenteTitulo, txtCreditos, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtCreditos).X / 2, AltoPantalla / 20), Color.White);
+            //agradecimientos y reconocimiento
+            switch (modoCreditos)
+            {
+                case 0:
+                    DibujaImagenes();
+                    break;
+                case 1:
+                    DibujaMusica();
+                    break;
+                case 2:
+                    DibujaAgradecimientos();
+                    break;
+            }
             btnVolverMenu.Dibuja();
             spriteBatch.End();
+        }
+        public void DibujaImagenes()
+        {
+            spriteBatch.DrawString(fuenteSub, txtImagenes,
+           new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString(txtImagenes).X / 2, posCreditos),
+           Color.White);
+
+            spriteBatch.DrawString(fuenteSub, txtImg,
+                new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString(txtImg).X / 2, posCreditos + fuenteSub.MeasureString(txtImagenes).Y),
+                Color.White);
+
+            spriteBatch.DrawString(fuenteSub, txtImg2,
+               new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString(txtImg2).X / 2, posCreditos + fuenteSub.MeasureString(txtImagenes).Y + fuenteSub.MeasureString(txtImg).Y),
+               Color.White);
+        }
+        public void DibujaMusica()
+        {
+            spriteBatch.DrawString(fuenteSub, txtMusica,
+                          new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString(txtMusica).X / 2, posCreditos),
+                          Color.White);
+
+            spriteBatch.DrawString(fuenteSub, txtMusic,
+               new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString(txtMusic).X / 2, posCreditos + fuenteSub.MeasureString(txtMusica).Y ),
+               Color.White);
+
+            spriteBatch.DrawString(fuenteSub, txtYoutube,
+               new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString(txtYoutube).X / 2, posCreditos +  fuenteSub.MeasureString(txtMusic).Y + fuenteSub.MeasureString(txtMusica).Y),
+               Color.White);
+
+            spriteBatch.DrawString(fuenteSub, txtCanal,
+         new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString(txtCanal).X / 2, posCreditos +  fuenteSub.MeasureString(txtMusic).Y + fuenteSub.MeasureString(txtMusica).Y + fuenteSub.MeasureString(txtYoutube).Y),
+         Color.White);
+        }
+        public void DibujaAgradecimientos()
+        {
+            spriteBatch.DrawString(fuenteSub, txtHecho,
+                        new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString(txtHecho).X / 2, posCreditos),
+                        Color.White);
+
+            spriteBatch.DrawString(fuenteSub, "Lucas Alonso",
+                        new Vector2(AnchoPantalla / 2 - fuenteSub.MeasureString("Lucas Alonso").X / 2, posCreditos+fuenteSub.MeasureString(txtHecho).Y),
+                        Color.White);
         }
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ CRÉDITOS
         public void GestionaCreditos()
         {
+            if(moverCreditos)
+            posCreditos += 1;
+            if (posCreditos >= AltoPantalla)
+            {
+
+                posCreditos = AltoPantalla / 20 + (int)fuenteTitulo.MeasureString(txtCreditos).Y;
+                modoCreditos++;
+                if (modoCreditos == 3)
+                    modoCreditos = 0;
+            }
             //si cambia el estado del click izq
             if (estadoClickIzq != Mouse.GetState().LeftButton)
             {
@@ -2051,13 +2120,17 @@ namespace ProtectTheWorld
                 switch (estadoClickIzq)
                 {
                     //si el boton izq está pulsado
+
                     case ButtonState.Pressed:
+                        moverCreditos = false;
                         //veo si he pulsado en el boton volver, de ser así, pongo su bandera a true
                         if (ClickIzq(btnVolverMenu))
                             btnVolverMenu.SetBandera(true);
+
                         break;
                     //si el boton izquierdo no está pulsado, se ha levantado, hago lo que obedezca a dicho boton
                     case ButtonState.Released:
+                        moverCreditos = true;
                         if (LevantoIzq(btnVolverMenu))
                         {
                             estadoActualJuego = EstadoJuego.Menu;
