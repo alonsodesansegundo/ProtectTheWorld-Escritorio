@@ -235,8 +235,8 @@ namespace ProtectTheWorld
             // TODO: Add your update logic here
 
             base.Update(gameTime);
-            //ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
-
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
             switch (estadoActualJuego)
             {
                 case EstadoJuego.Menu:
@@ -445,9 +445,6 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ PRINCIPAL
         public void GestionaMenu()
         {
-            //si pulsa la tecla ESC
-            if (teclado.IsKeyDown(Keys.Escape))
-                this.Exit();
             //si cambia el estado del click izq
             if (estadoClickIzq != Mouse.GetState().LeftButton)
             {
