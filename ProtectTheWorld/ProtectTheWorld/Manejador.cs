@@ -29,6 +29,7 @@ namespace ProtectTheWorld
         SpriteBatch spriteBatch;
 
         private KeyboardState teclado;
+        private Texture2D fondoSubmenu;
         //**********************MENU**********************
         private int espacio;
         private EstadoJuego estadoActualJuego;
@@ -113,6 +114,7 @@ namespace ProtectTheWorld
         /// and initialize them as well.
         /// </summary>
 
+         
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -121,8 +123,9 @@ namespace ProtectTheWorld
 
             //PANTALLA COMPLETA
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
-            
-            
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+
+
             //INICIALIZO LA PRIMERA PANTALLA
             estadoActualJuego = EstadoJuego.Menu;
 
@@ -232,6 +235,8 @@ namespace ProtectTheWorld
             // TODO: Add your update logic here
 
             base.Update(gameTime);
+            //ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
+
             switch (estadoActualJuego)
             {
                 case EstadoJuego.Menu:
@@ -303,6 +308,7 @@ namespace ProtectTheWorld
         public void CargarImagenes()
         {
             fondoMenu = Content.Load<Texture2D>("fondomenu");
+            fondoSubmenu = Content.Load<Texture2D>("fondoSubmenu");
             imgMarciano1 = Content.Load<Texture2D>("mio1");
             imgMarciano2 = Content.Load<Texture2D>("mio2");
             imgBala = Content.Load<Texture2D>("proyectilnave");
@@ -745,7 +751,7 @@ namespace ProtectTheWorld
                     miNave.moverNave(miNave.getX() - vNave, AnchoPantalla - anchoNave);
 
                 //SI PULSA EL ESPACIO
-                if (teclado.IsKeyDown(Keys.Space) && !miNave.getHayBala())
+                if (teclado.IsKeyDown(Keys.Space))
                     miNave.disparar();
             }
         }
@@ -1546,6 +1552,7 @@ namespace ProtectTheWorld
         {
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
+            spriteBatch.Draw(fondoSubmenu, new Rectangle(0, 0, AnchoPantalla, AltoPantalla), Color.White);
             spriteBatch.DrawString(fuenteTitulo, txtOpciones, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtOpciones).X / 2, AltoPantalla / 20), Color.White);
             //boton volver
             btnVolverMenu.Dibuja();
@@ -1795,6 +1802,7 @@ namespace ProtectTheWorld
         {
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
+            spriteBatch.Draw(fondoSubmenu, new Rectangle(0, 0, AnchoPantalla, AltoPantalla), Color.White);
             spriteBatch.DrawString(fuenteTitulo, txtAyuda, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtAyuda).X / 2, AltoPantalla / 20), Color.White);
             btnVolverMenu.Dibuja();
 
@@ -1913,6 +1921,7 @@ namespace ProtectTheWorld
         {
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
+            spriteBatch.Draw(fondoSubmenu, new Rectangle(0, 0, AnchoPantalla, AltoPantalla), Color.White);
             spriteBatch.DrawString(fuenteTitulo, txtRecords, new Vector2(AnchoPantalla / 2 - (int)fuenteTitulo.MeasureString(txtRecords).X / 2, AltoPantalla / 20), Color.White);
             btnVolverMenu.Dibuja();
             //dibujo los records
@@ -1962,7 +1971,6 @@ namespace ProtectTheWorld
                             new Vector2((int)AnchoPantalla / 2 - (int)fuenteBotones.MeasureString(" " + listaSiglas[i] + " " + listaPuntuaciones[i]).X / 2,
                             posY),
                             Color.White);
-                        break;
                         break;
                     default:
                         spriteBatch.DrawString(fuenteBotones,
@@ -2039,6 +2047,7 @@ namespace ProtectTheWorld
         {
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
+            spriteBatch.Draw(fondoSubmenu, new Rectangle(0, 0, AnchoPantalla, AltoPantalla), Color.White);
             spriteBatch.DrawString(fuenteTitulo, txtCreditos, new Vector2(AnchoPantalla / 2 - fuenteTitulo.MeasureString(txtCreditos).X / 2, AltoPantalla / 20), Color.White);
             //agradecimientos y reconocimiento
             switch (modoCreditos)
