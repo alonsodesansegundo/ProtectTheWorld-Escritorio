@@ -445,13 +445,9 @@ namespace ProtectTheWorld
         //MÉTODO ENCARGADO DE GESTIONAR LA LÓGICA DEL MENÚ PRINCIPAL
         public void GestionaMenu()
         {
-            //TECLADO
-            teclado = Keyboard.GetState();
             //si pulsa la tecla ESC
             if (teclado.IsKeyDown(Keys.Escape))
-            {
                 this.Exit();
-            }
             //si cambia el estado del click izq
             if (estadoClickIzq != Mouse.GetState().LeftButton)
             {
@@ -485,6 +481,16 @@ namespace ProtectTheWorld
                         {
                             estadoActualJuego = EstadoJuego.Opciones;
                             //pongo la musica del submenu
+                            if (boolMusica)
+                            {
+                                btnMusicaSi.SetColor(Color.Green);
+                                btnMusicaNo.SetColor(Color.Red);
+                            }
+                            else
+                            {
+                                btnMusicaSi.SetColor(Color.Red);
+                                btnMusicaNo.SetColor(Color.Green);
+                            }
                             if (boolMusica)
                                 SuenaCancion(cancionSubmenu);
                         }
