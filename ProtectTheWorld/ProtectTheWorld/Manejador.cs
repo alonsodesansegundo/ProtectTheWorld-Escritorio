@@ -745,9 +745,6 @@ namespace ProtectTheWorld
         {
             //TECLADO
             teclado = Keyboard.GetState();
-
-            if (modo == "jugando")
-            {
                 //SI PULSA LA FLECHA DRCH
                 if (teclado.IsKeyDown(Keys.Right))
                     miNave.moverNave(miNave.getX() + vNave, AnchoPantalla - anchoNave);
@@ -759,7 +756,6 @@ namespace ProtectTheWorld
                 //SI PULSA EL ESPACIO
                 if (teclado.IsKeyDown(Keys.Space))
                     miNave.disparar();
-            }
         }
         //------------------------RELLENA EL ARRAY DE MARCIANOS------------------------
         public void rellenaMarcianos()
@@ -1202,6 +1198,8 @@ namespace ProtectTheWorld
             {
                 case "jugando":
                     auxiliar++;
+                    //TECLADO PARA MOVIMIENTO Y DISPARO NAVE 
+                    gestionaTeclado();
                     //BALAS MARCIANOS
                     if (auxiliar == 200)
                     {
@@ -1232,8 +1230,6 @@ namespace ProtectTheWorld
                     GestionaBotonesJuego();
                     break;
             }
-            //TECLADO
-            gestionaTeclado();
         }
         //------------------------PULSA PAUSA------------------------
         public void GestionaBotonesJuego()
