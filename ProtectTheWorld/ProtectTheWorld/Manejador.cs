@@ -468,6 +468,9 @@ namespace ProtectTheWorld
                         if (LevantoIzq(btnJugar))
                         {
                             estadoActualJuego = EstadoJuego.Gameplay;
+                            //img boton pausa
+                            btnPausa.SetImagen(imgBtnPausa);
+                            //variables del juego
                             InicializaVariablesJuego();
                             //pongo la musica del juego
                             if (boolMusica)
