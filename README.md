@@ -5,3 +5,5 @@ Protect the World es un videojuego muy similar al tradicional 'Space Invaders', 
 Mencionar que el disparo se ejecuta de manera automática, de manera que sólo habrá un único proyectil o bala en la pantalla.
 
 Dicho videojuego ha sido creado por mi mismo en toda su totalidad.
+
+Este videojuego fue presentado como Trabajo de Fin de Ciclo de DAM (Desarrollo de Aplicaciones Multiplataforma).
